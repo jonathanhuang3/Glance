@@ -10,6 +10,10 @@ public class ScotomaHandler : MonoBehaviour
     public Scotoma scotoma = Scotoma.None;
     public List<GameObject> scotomas = new List<GameObject>(); // For User to provide scotoma gameobjects in Unity editor
     private GameObject currentScotoma;
+    public GameObject CurrentScotoma
+    {
+        get { return currentScotoma; }
+    }
 
     void OnEnable()
     {

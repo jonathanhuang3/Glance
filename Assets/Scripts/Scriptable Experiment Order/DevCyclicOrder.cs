@@ -11,7 +11,7 @@ public class DevCyclicOrder : ExperimentOrder
         {
             name = "Stimulus 1",
             driver = MetaStimulus.OKRDriver.TumblingE,
-            scotoma = MetaStimulus.Scotoma.Grid,
+            scotoma = MetaStimulus.Scotoma.Cone,
             repetitionLimit = 15,
             calibNeeded = false
         };
@@ -22,7 +22,7 @@ public class DevCyclicOrder : ExperimentOrder
             driver = MetaStimulus.OKRDriver.Dots,
             movementDirection = MetaStimulus.Direction.Up,
             contrast = MetaStimulus.Contrast.High,
-            scotoma = MetaStimulus.Scotoma.None,
+            scotoma = MetaStimulus.Scotoma.Cone,
             duration = 100f, //423f
             calibNeeded = false
         };

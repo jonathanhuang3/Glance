@@ -22,8 +22,6 @@ public class ExperimentScheduler : MonoBehaviour
     // Stimulus setup
     public List<GameObject> drivers = new List<GameObject>();
     private GameObject objectDriver;
-    public GameObject cameraMask; // Will be replaced with a List of all scotomas (similar to drivers)
-
     // UI and experiment setup
     public GameObject waitingRoom;
 
@@ -68,7 +66,7 @@ public class ExperimentScheduler : MonoBehaviour
     {
         // While current stimulus is active, end current stimulus and enter waiting room. Raised by Stimulus component
         EnterWaitingRoom($"\nSkipped {stimulusName}. \nPress \u2192 to begin");
-        CloseGameObjects(objectDriver, cameraMask);
+        CloseGameObjects(objectDriver);
         // objectDriver.SetActive(false);
     }
     void OnSkipStimulus()
@@ -109,7 +107,7 @@ public class ExperimentScheduler : MonoBehaviour
     {
         // While current stimulus is active, enter waiting room just to repeat stimulus. Raised by Stimulus component
         EnterWaitingRoom($"\nPress \u2192 to repeat Stimulus {currentStimulus + 1}", repeatStimulus: true);
-        CloseGameObjects(objectDriver, cameraMask);
+        CloseGameObjects(objectDriver);
         // objectDriver.SetActive(false);
     }
     void BeginExperiment()
@@ -142,7 +140,7 @@ public class ExperimentScheduler : MonoBehaviour
 
 
         EnterWaitingRoom($"\nPress \u2192 to continue \nPress \u2190 to repeat");
-        CloseGameObjects(objectDriver, cameraMask);
+        CloseGameObjects(objectDriver);
         // objectDriver.SetActive(false);
         // StartCoroutine(WaitForInput()); // This is now raised in an event in the waiting room controller
     }

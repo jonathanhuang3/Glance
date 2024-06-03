@@ -42,8 +42,11 @@ public class Stimulus : MonoBehaviour
     // Scotoma setup
     public delegate void ModulateScotomaOcclusionHandler(bool occlusionAmount); // Generic delegate for occlusion amount, to be passed either a float or an int
     public static event ModulateScotomaOcclusionHandler ModulateScotomaOcclusion;
+    public delegate void CycleOcclusionHandler(int minParticles, int maxParticles, float timeframe, float pauseDuration);
+    public static event CycleOcclusionHandler CycleOcclusion;
 
     // Stimulus associated objects
+    public GameObject rotationHandle;
     public GameObject scotomaHandler;
     public enum Scotoma { None, Cone, Central, Peripheral, Grid };
     public Scotoma scotoma = Scotoma.None;
@@ -126,8 +129,13 @@ public class Stimulus : MonoBehaviour
     {
         this.rayDirection = this.gazeUtility.GetGazeRay();
         this.headingRotation = this.gazeUtility.HeadingRotation(transform.forward, transform.up); // Useful to rotate stimulus to directly in front of XR rig
+
+        // Rotate the stimulus system. Hopefully, all other components will rotate as well, if they are children of the rotation handle.
+        rotationHandle.transform.rotation = this.headingRotation;
+        // ps.transform.rotation = this.headingRotation; // This won't be necessary if the particle system is a child of the rotation handle
+
         // this.towardGazeRotation = this.gazeUtility.GazeTrackingRotation(transform.forward, transform.up); // Useful for gaze contingent scotoma, but as been changed to let ScotomaHandler poll this value.
-        if (this.scotoma != Scotoma.None) scotomaHandler.transform.rotation = this.headingRotation; // Rotate scotoma to match XR rig rotation
+        // if (this.scotoma != Scotoma.None) scotomaHandler.transform.rotation = this.headingRotation; // Rotate scotoma to match XR rig rotation
 
         this.gazePositions.Add(this.rayDirection); // Absolute gaze vector in world space (shifted due to rotation of XR rig)
         this.rotatedGaze.Add(Quaternion.Inverse(this.headingRotation) * this.rayDirection); // Rotates gaze vector back in front of origin
@@ -189,6 +197,11 @@ public class Stimulus : MonoBehaviour
     protected void ScotomaModulateOcclusion(bool correct)
     {
         ModulateScotomaOcclusion?.Invoke(correct);
+    }
+
+    protected void ScotomaCycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
+    {
+        CycleOcclusion?.Invoke(minParticles, maxParticles, timeframe, pauseDuration);
     }
 
     private float PixelsVisible(RenderTexture rendTex)

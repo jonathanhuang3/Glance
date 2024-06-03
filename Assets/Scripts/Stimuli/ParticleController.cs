@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class ParticleController : Stimulus
 {
-
+    // Particle system
     public ParticleSystem ps;
     public float amplitude = 1.25f;
     private ParticleSystem.VelocityOverLifetimeModule velocityOverLifetime;
@@ -20,6 +20,7 @@ public class ParticleController : Stimulus
     private List<float> dotsFrequencies = new List<float>();
     private float[] _phase = new float[4];
     private List<float> dotsPhase = new List<float>();
+    // For unidirectional case to replicate mouse stimulus
     public bool unidirectonal = false;
     public float defaultVelocity = 3f;
 
@@ -76,6 +77,8 @@ public class ParticleController : Stimulus
     protected override void Update()
     {
         base.Update();
+
+        if (unidirectional) this.ScotomaCycleOcclusion(0, 9000, this.duration, 1f);
         float v = unidirectonal ? defaultVelocity : VelocityNonHarmonic(Time.time, dotsFrequencies, dotsPhase);
         Vector3 velocity = Vector3.zero;
 

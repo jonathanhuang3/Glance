@@ -39,12 +39,30 @@ public class Scotoma : MonoBehaviour
 
         if (toggleMotionJitter) transform.position = MotionJitter();
     }
+    /// <summary>
+    /// Modulates the occlusion of the scene.
+    /// </summary>
+    /// <param name="correct">A boolean value indicating whether the occlusion should be corrected.</param>
     protected virtual void ModulateOcclusion(bool correct)
     {
         // Occlude varying amounts of the scene by either changing scale or modifying shader (Scotoma specific)
         // Generic type - either int or float
     }
 
+    /// <summary>
+    /// Cycle from fractional occlusion from zero to one to zero, in `timeframe` amount of time, with n second pause at minimum and maximum occlusions
+    /// </summary>
+    /// <param name="timeframe">The amount of time it takes to complete one cycle of occlusion</param>
+    /// <param name="pauseDuration">The duration of the pause at minimum and maximum occlusions</param>
+    protected virtual void CycleOcclusion(float timeframe, float pauseDuration)
+    {
+
+    }
+
+    /// <summary>
+    /// Calculates a jittered motion for the scotoma.
+    /// </summary>
+    /// <returns>A new position for the scotoma.</returns>
     protected virtual Vector3 MotionJitter()
     {
         // Jitter particles uniformly
@@ -56,6 +74,9 @@ public class Scotoma : MonoBehaviour
         return newPosition;
     }
 
+    /// <summary>
+    /// Tracks the gaze and occludes the scene based on the gaze.
+    /// </summary>
     protected virtual void TrackGaze()
     {
         // Track gaze and occlude scene based on gaze

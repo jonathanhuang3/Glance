@@ -83,7 +83,7 @@ public class TumblingOptotype : Stimulus
     public GameObject audioObject;
     private AudioSource audioData;
 
-    public ParticleSystem ps; // particle system from scotoma
+    private ParticleSystem scotomaPs; // particle system from scotoma set from scotomaHandler
     private ParticleSystem.ShapeModule shape;
     // MetaStimulus for this stimulus stores scotoma information, MetaStimulus.Scotoma.Grid, which is currently not being used.
     private enum ScotomaGrid { S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, NumStates }; // Corresponds to indices in masks. Finer modulation of noise occurs through `tiling`
@@ -121,7 +121,8 @@ public class TumblingOptotype : Stimulus
 
         if (particleDispersions.Count == 0)
         {
-            shape = ps.shape;
+            scotomaPs = scotomaHandler.GetComponent<ScotomaHandler>().CurrentScotoma.GetComponent<ParticleSystem>();
+            shape = scotomaPs.shape;
             particleDispersions.AddRange(Enumerable.Range(0, numStates).Select(i => maxParticleDispersion - i * (maxParticleDispersion - minParticleDispersion) / (numStates - 1)));
             particleDispersionGroups.AddRange(Enumerable.Range(0, numGroups).Select(i => particleDispersions.Skip(i * numGroups).Take(numGroups).ToList()));
         }

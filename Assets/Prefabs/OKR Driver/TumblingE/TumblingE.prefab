@@ -353,6 +353,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4200568986872994532}
+  - component: {fileID: 3011706906133654520}
   m_Layer: 3
   m_Name: TumblingE
   m_TagString: Untagged
@@ -376,6 +377,36 @@ Transform:
   - {fileID: 4200568987015882301}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3011706906133654520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4200568986872994533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0556e0edca72574baee716ce5aeb33f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stimulusName: 
+  instructions: 
+  duration: 0
+  rotationHandle: {fileID: 0}
+  scotomaHandler: {fileID: 0}
+  scotoma: 0
+  saveTracking: 1
+  calibNeeded: 1
+  renderTexture: {fileID: 8400000, guid: 8e1c8e65f3c3eb945b42424c0f116ba7, type: 2}
+  stimulusRenderTexture: {fileID: 8400000, guid: 2df318a91c9cae04ea4c5bbce4569c2a,
+    type: 2}
+  handle: {fileID: 0}
+  optotypeText: {fileID: 4200568986804295418}
+  tiling: 1
+  repetitionLimit: 0
+  audioObject: {fileID: 8951486769909658832, guid: adb243460a067394fbffce5bd378e931,
+    type: 3}
+  ps: {fileID: 0}
 --- !u!1 &4200568987015882290
 GameObject:
   m_ObjectHideFlags: 0
