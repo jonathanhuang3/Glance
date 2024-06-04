@@ -41,7 +41,7 @@ public class UnidirectionalHandler : Stimulus
     {
 
         var theater = GameObject.Find("Unidirectional/Theater");
-        theater.transform.rotation = this.headingRotation;
+        // theater.transform.rotation = this.headingRotation;
 
         // Set the speed variable of the shader
         theater.GetComponent<Renderer>().material.SetFloat("_Speed", speed);

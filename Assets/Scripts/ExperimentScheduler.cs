@@ -20,6 +20,7 @@ public class ExperimentScheduler : MonoBehaviour
     public IEnumerator<MetaStimulus> scheduleEnumerator;
 
     // Stimulus setup
+    public GameObject rotationHandle;
     public List<GameObject> drivers = new List<GameObject>();
     private GameObject objectDriver;
     // UI and experiment setup
@@ -27,6 +28,7 @@ public class ExperimentScheduler : MonoBehaviour
 
 
     // Internal setup
+    private GazeUtility gazeUtility;
     private DateTime experimentStartTime;
     private int currentStimulus = 0;
 
@@ -35,7 +37,13 @@ public class ExperimentScheduler : MonoBehaviour
         PlayerInfo.Initialize(playerName, playerID, experimentTag);
         scheduleEnumerator = schedule.MetaStimuli.GetEnumerator();
         experimentStartTime = DateTime.Now;
+        gazeUtility = new GazeUtility();
         BeginExperiment();
+    }
+
+    void Update()
+    {
+        rotationHandle.transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
     }
 
     void OnEnable()
@@ -161,14 +169,16 @@ public class ExperimentScheduler : MonoBehaviour
         switch (currentMetaStimulus.driver)
         {
             case MetaStimulus.OKRDriver.Dots:
-                DotsSpawner dotsSpawner = objectDriver.GetComponent<DotsSpawner>();
-                dotsSpawner.stimulusName = currentMetaStimulus.name;
-                dotsSpawner.instructions = currentMetaStimulus.name;
-                dotsSpawner.duration = currentMetaStimulus.duration;
-                dotsSpawner.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
-                dotsSpawner.movementDirection = (DotsSpawner.Direction)currentMetaStimulus.movementDirection;
-                dotsSpawner.contrast = (DotsSpawner.Contrast)currentMetaStimulus.contrast;
-                dotsSpawner.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
+                ParticleController particleController = objectDriver.GetComponent<ParticleController>();
+                particleController.stimulusName = currentMetaStimulus.name;
+                particleController.instructions = currentMetaStimulus.name;
+                particleController.duration = currentMetaStimulus.duration;
+                particleController.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
+                particleController.movementDirection = (ParticleController.Direction)currentMetaStimulus.movementDirection;
+                particleController.unidirectional = currentMetaStimulus.unidirectionalDots;
+                particleController.contrast = (ParticleController.Contrast)currentMetaStimulus.contrast;
+                // Add cycle contrast toggle
+                particleController.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
                 objectDriver.SetActive(true);
                 break;
             case MetaStimulus.OKRDriver.Unidirectional:
@@ -219,10 +229,10 @@ public class ExperimentScheduler : MonoBehaviour
             switch (errantStimulus.driver)
             {
                 case MetaStimulus.OKRDriver.Dots:
-                    objectDriver.GetComponent<DotsSpawner>().stimulusName = errantStimulus.name;
-                    objectDriver.GetComponent<DotsSpawner>().instructions = errantStimulus.name;
-                    objectDriver.GetComponent<DotsSpawner>().duration = errantStimulus.duration;
-                    objectDriver.GetComponent<DotsSpawner>().calibNeeded = errantStimulus.calibNeeded;
+                    objectDriver.GetComponent<ParticleController>().stimulusName = errantStimulus.name;
+                    objectDriver.GetComponent<ParticleController>().instructions = errantStimulus.name;
+                    objectDriver.GetComponent<ParticleController>().duration = errantStimulus.duration;
+                    objectDriver.GetComponent<ParticleController>().calibNeeded = errantStimulus.calibNeeded;
                     break;
                 case MetaStimulus.OKRDriver.Unidirectional:
                     objectDriver.GetComponent<UnidirectionalHandler>().stimulusName = errantStimulus.name;
@@ -254,10 +264,10 @@ public class ExperimentScheduler : MonoBehaviour
             switch (currentMetaStimulus.driver)
             {
                 case MetaStimulus.OKRDriver.Dots:
-                    objectDriver.GetComponent<DotsSpawner>().stimulusName = currentMetaStimulus.name;
-                    objectDriver.GetComponent<DotsSpawner>().instructions = currentMetaStimulus.name;
-                    objectDriver.GetComponent<DotsSpawner>().duration = currentMetaStimulus.duration;
-                    objectDriver.GetComponent<DotsSpawner>().calibNeeded = currentMetaStimulus.calibNeeded;
+                    objectDriver.GetComponent<ParticleController>().stimulusName = currentMetaStimulus.name;
+                    objectDriver.GetComponent<ParticleController>().instructions = currentMetaStimulus.name;
+                    objectDriver.GetComponent<ParticleController>().duration = currentMetaStimulus.duration;
+                    objectDriver.GetComponent<ParticleController>().calibNeeded = currentMetaStimulus.calibNeeded;
                     break;
                 case MetaStimulus.OKRDriver.Unidirectional:
                     objectDriver.GetComponent<UnidirectionalHandler>().stimulusName = currentMetaStimulus.name;

@@ -21,7 +21,7 @@ public class ParticleController : Stimulus
     private float[] _phase = new float[4];
     private List<float> dotsPhase = new List<float>();
     // For unidirectional case to replicate mouse stimulus
-    public bool unidirectonal = false;
+    public bool unidirectional = false;
     public float defaultVelocity = 3f;
 
     // Direction parameters
@@ -68,7 +68,7 @@ public class ParticleController : Stimulus
             shapeModule.scale = new Vector3(1, 0, 1); // 2D in xz plane
             // Velocity
             velocityOverLifetime.enabled = true;
-            velocityOverLifetime.space = ParticleSystemSimulationSpace.World;
+            velocityOverLifetime.space = ParticleSystemSimulationSpace.Local;
         }
         dotsPhase.AddRange(Enumerable.Range(0, _phase.Length).Select(_ => UnityEngine.Random.Range(0f, 2 * Mathf.PI)));
         dotsFrequencies.AddRange(coeff.Select(c => c * _frequency));
@@ -79,16 +79,16 @@ public class ParticleController : Stimulus
         base.Update();
 
         if (unidirectional) this.ScotomaCycleOcclusion(0, 9000, this.duration, 1f);
-        float v = unidirectonal ? defaultVelocity : VelocityNonHarmonic(Time.time, dotsFrequencies, dotsPhase);
+        float v = unidirectional ? defaultVelocity : VelocityNonHarmonic(Time.time, dotsFrequencies, dotsPhase);
         Vector3 velocity = Vector3.zero;
 
         switch (movementDirection)
         {
             case Direction.Up:
-                velocity = new Vector3(0, v, 0);
+                velocity = new Vector3(0, 0, v); // z is up for the particle system, due to its initial rotation and local space
                 break;
             case Direction.Diagonal:
-                velocity = new Vector3(v, v, 0) * MathF.Sqrt(2) / 2f; // normalize based on 1-1-sqrt(2) triangle
+                velocity = new Vector3(v, 0, v) * MathF.Sqrt(2) / 2f; // normalize based on 1-1-sqrt(2) triangle
                 break;
             case Direction.Horizontal:
                 velocity = new Vector3(v, 0, 0);

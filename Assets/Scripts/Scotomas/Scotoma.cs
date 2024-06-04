@@ -8,7 +8,8 @@ public class Scotoma : MonoBehaviour
 {
     public bool gazeContingent = false;
     protected float speed = 3f;
-    public bool toggleMotionJitter = false;
+    public bool toggleMotionJitter = true;
+    public GameObject cameraRig;
 
     public MetaStimulus.OKRDriver stimulusType;
     protected GazeUtility gazeUtility;
@@ -43,7 +44,8 @@ public class Scotoma : MonoBehaviour
     /// Modulates the occlusion of the scene.
     /// </summary>
     /// <param name="correct">A boolean value indicating whether the occlusion should be corrected.</param>
-    protected virtual void ModulateOcclusion(bool correct)
+    /// <param name="occlusionAmount">The amount of occlusion to apply.</param>
+    protected virtual void ModulateOcclusion(bool correct, float occlusionAmount)
     {
         // Occlude varying amounts of the scene by either changing scale or modifying shader (Scotoma specific)
         // Generic type - either int or float
@@ -54,7 +56,7 @@ public class Scotoma : MonoBehaviour
     /// </summary>
     /// <param name="timeframe">The amount of time it takes to complete one cycle of occlusion</param>
     /// <param name="pauseDuration">The duration of the pause at minimum and maximum occlusions</param>
-    protected virtual void CycleOcclusion(float timeframe, float pauseDuration)
+    protected virtual void CycleOcclusion(int min, int max, float timeframe, float pauseDuration)
     {
 
     }
@@ -66,11 +68,12 @@ public class Scotoma : MonoBehaviour
     protected virtual Vector3 MotionJitter()
     {
         // Jitter particles uniformly
-        // shape.position = Vector3.Lerp(shape.position, new Vector3(Random.Range(-0.25f, 0.25f), 0f, Random.Range(-0.25f, 0.25f)), 0.1f);
-        Vector3 translation = new Vector3(Random.Range(-0.25f, 0.25f), Random.Range(-0.25f, 0.25f), 0f) * Time.deltaTime;
+        // shape.position = Vector3.Lerp(shape.position, new Vector3(Random.Range(-bound, bound), 0f, Random.Range(-bound, bound)), 0.1f);
+        float bound = 0.2f;
+        Vector3 translation = new Vector3(Random.Range(-bound, bound), Random.Range(-bound, bound), 0f) * Time.deltaTime;
         Vector3 newPosition = transform.position + translation;
-        newPosition.x = Mathf.Clamp(newPosition.x, -0.25f, 0.25f); // Keep within bounds
-        newPosition.y = Mathf.Clamp(newPosition.y, -0.25f, 0.25f);
+        newPosition.x = Mathf.Clamp(newPosition.x, -bound, bound); // Keep within bounds
+        newPosition.y = Mathf.Clamp(newPosition.y, -bound, bound);
         return newPosition;
     }
 

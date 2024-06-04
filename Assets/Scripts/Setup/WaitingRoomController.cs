@@ -36,7 +36,7 @@ public class WaitingRoomController : MonoBehaviour
     void Update()
     {
         // Issue with perpetual rotation occurs when rotating the attached gameobject. solution is to create nested gameobject 'Handle', and rotate, thus rotating the actual canvas.
-        GameObject.Find("Handle").transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
+        // GameObject.Find("Handle").transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.RightArrow))
         {

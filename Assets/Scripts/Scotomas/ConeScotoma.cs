@@ -9,6 +9,8 @@ public class ConeScotoma : Scotoma
     private ParticleSystem.ShapeModule shape;
     private ParticleSystem.MainModule main;
 
+    private List<int> occlusionSteps = new List<int>();
+
     protected override void OnEnable()
     {
         base.OnEnable();
@@ -16,47 +18,55 @@ public class ConeScotoma : Scotoma
 
         if (ps != null)
         {
+            // For optotype, can get away with 3000 - 7000 particles with radius of 0.5 and 0 dispersion
+            // For Dots, will need to increase to 10000 particles with radius of 1.1 and 0 dispersion
             main = ps.main;
             shape = ps.shape;
             ParticleSystem.EmissionModule emissionModule = ps.emission;
             ParticleSystem.VelocityOverLifetimeModule velocityOverLifetime = ps.velocityOverLifetime;
 
-            mainModule.startLifetime = 10000f;
-            mainModule.startSpeed = 0f;
-            mainModule.maxParticles = 3000;
+            main.startLifetime = 10000f;
+            main.startSpeed = 0f;
+            main.maxParticles = 3000;
             // Emission
-            emissionModule.rateOverTime = 10000f;
+            emissionModule.rateOverTime = 100000f;
             // Shape
-            shapeModule.shapeType = ParticleSystemShapeType.Sphere;
-            shapeModule.radius = this.stimulusType == MetaStimulus.OKRDriver.TumblingE ? 5f : 15f;
-            shapeModule.randomPositionAmount = 10f;
-            shapeModule.scale = new Vector3(1, 0, 1); // 2D in xz plane
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.5f;
+            shape.randomPositionAmount = 0f;
+            shape.scale = new Vector3(1, 0, 1); // 2D in xz plane
             // Velocity
             velocityOverLifetime.enabled = true;
             velocityOverLifetime.space = ParticleSystemSimulationSpace.World;
         }
     }
 
-    protected override void ModulateOcclusion(bool correct)
+    protected override void ModulateOcclusion(bool correct, float occlusionAmount)
     {
-        shape.randomPositionAmount += correct ? -0.03f : 0.05f;
+        // shape.randomPositionAmount += correct ? -0.03f : 0.05f;
+        // main.maxParticles += correct ? 300 : -200;
+        main.maxParticles = (int)occlusionAmount;
         ps.Clear(); // Re-emit particles with new spacing
         ps.Play();
     }
 
     protected override void CycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
     {
-        StartCoroutine(CycleOcclusion(minParticles, maxParticles, timeframe, pauseDuration));
+        StartCoroutine(CyclicOcclusion(minParticles, maxParticles, timeframe, pauseDuration));
     }
 
-    IEnumerator CycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
+    IEnumerator CyclicOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
     {
+        float rampTime = (timeframe / 2) - 3 * pauseDuration;
+
+        // Initial wait before starting
+        yield return new WaitForSeconds(pauseDuration);
         while (true)
         {
             // Increase from min to max
-            for (float t = 0; t <= 1; t += Time.deltaTime / timeframe)
+            for (float t = 0; t <= 1; t += Time.deltaTime / rampTime)
             {
-                main.maxParticles = Mathf.Lerp(minParticles, maxParticles, t);
+                main.maxParticles = (int)Mathf.Lerp(minParticles, maxParticles, t);
                 ps.Clear(); // Re-emit particles with new spacing
                 ps.Play();
                 yield return null;
@@ -66,9 +76,9 @@ public class ConeScotoma : Scotoma
             yield return new WaitForSeconds(pauseDuration);
 
             // Decrease from max to min
-            for (float t = 1; t >= 0; t -= Time.deltaTime / timeframe)
+            for (float t = 1; t >= 0; t -= Time.deltaTime / rampTime)
             {
-                main.maxParticles = Mathf.Lerp(minParticles, maxParticles, t);
+                main.maxParticles = (int)Mathf.Lerp(minParticles, maxParticles, t);
                 ps.Clear(); // Re-emit particles with new spacing
                 ps.Play();
                 yield return null;

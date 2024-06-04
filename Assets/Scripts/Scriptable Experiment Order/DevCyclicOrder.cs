@@ -21,6 +21,7 @@ public class DevCyclicOrder : ExperimentOrder
             name = "Stimulus 2",
             driver = MetaStimulus.OKRDriver.Dots,
             movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
             contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.Cone,
             duration = 100f, //423f

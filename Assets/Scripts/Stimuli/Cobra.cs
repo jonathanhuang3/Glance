@@ -91,7 +91,7 @@ public class Cobra : Stimulus
         Quaternion shiftRotation = this.headingRotation;
         Vector3 cameraOffset = xrRig.transform.position - backdrop.transform.position; // not currently used
 
-        GameObject.Find("COBRA/BackdropHandle").transform.rotation = shiftRotation;
+        // GameObject.Find("COBRA/BackdropHandle").transform.rotation = shiftRotation;
 
         // Form mask to filter out eye data when tracker is not moving
         movementMask.Add(isMoving);

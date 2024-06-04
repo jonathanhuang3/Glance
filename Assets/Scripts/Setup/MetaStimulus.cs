@@ -10,6 +10,7 @@ public class MetaStimulus
     public OKRDriver driver = OKRDriver.Dots;
     public enum Direction { Up, Diagonal, Horizontal, Down }
     public Direction movementDirection = Direction.Up;
+    public bool unidirectionalDots = false; // For unidirectional dots stimulus (for ramping scotomas)
     public enum Contrast { Low, High, Cycle }
     public Contrast contrast = Contrast.High;
 

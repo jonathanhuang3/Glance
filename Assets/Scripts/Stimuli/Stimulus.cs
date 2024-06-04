@@ -40,13 +40,12 @@ public class Stimulus : MonoBehaviour
     public delegate void RepeatStimulusHandler();
     public static event RepeatStimulusHandler RepeatStimulus;
     // Scotoma setup
-    public delegate void ModulateScotomaOcclusionHandler(bool occlusionAmount); // Generic delegate for occlusion amount, to be passed either a float or an int
+    public delegate void ModulateScotomaOcclusionHandler(bool correct, float occlusionAmount); // Generic delegate for occlusion amount, to be passed either a float or an int
     public static event ModulateScotomaOcclusionHandler ModulateScotomaOcclusion;
     public delegate void CycleOcclusionHandler(int minParticles, int maxParticles, float timeframe, float pauseDuration);
     public static event CycleOcclusionHandler CycleOcclusion;
 
     // Stimulus associated objects
-    public GameObject rotationHandle;
     public GameObject scotomaHandler;
     public enum Scotoma { None, Cone, Central, Peripheral, Grid };
     public Scotoma scotoma = Scotoma.None;
@@ -98,11 +97,13 @@ public class Stimulus : MonoBehaviour
 
     public void SkipThisStimulus()
     {
+        scotomaHandler.SetActive(false);
         SkipStimulus?.Invoke(this.stimulusName);
     }
 
     public void RepeatThisStimulus()
     {
+        scotomaHandler.SetActive(false);
         RepeatStimulus?.Invoke();
     }
 
@@ -114,12 +115,12 @@ public class Stimulus : MonoBehaviour
         if (scotoma != Scotoma.None)
         {
             ToggleScotoma(true);
-            renderTexture.width = Screen.width;
-            renderTexture.height = Screen.height;
-            stimulusRenderTexture.width = Screen.width;
-            stimulusRenderTexture.height = Screen.height;
+            // renderTexture.width = Screen.width;
+            // renderTexture.height = Screen.height;
+            // stimulusRenderTexture.width = Screen.width;
+            // stimulusRenderTexture.height = Screen.height;
 
-            tex = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+            tex = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         }
 
         TryToCalibrate();
@@ -131,7 +132,6 @@ public class Stimulus : MonoBehaviour
         this.headingRotation = this.gazeUtility.HeadingRotation(transform.forward, transform.up); // Useful to rotate stimulus to directly in front of XR rig
 
         // Rotate the stimulus system. Hopefully, all other components will rotate as well, if they are children of the rotation handle.
-        rotationHandle.transform.rotation = this.headingRotation;
         // ps.transform.rotation = this.headingRotation; // This won't be necessary if the particle system is a child of the rotation handle
 
         // this.towardGazeRotation = this.gazeUtility.GazeTrackingRotation(transform.forward, transform.up); // Useful for gaze contingent scotoma, but as been changed to let ScotomaHandler poll this value.
@@ -194,9 +194,9 @@ public class Stimulus : MonoBehaviour
         }
     }
 
-    protected void ScotomaModulateOcclusion(bool correct)
+    protected void ScotomaModulateOcclusion(bool correct, float occlusionAmount)
     {
-        ModulateScotomaOcclusion?.Invoke(correct);
+        ModulateScotomaOcclusion?.Invoke(correct, occlusionAmount);
     }
 
     protected void ScotomaCycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)

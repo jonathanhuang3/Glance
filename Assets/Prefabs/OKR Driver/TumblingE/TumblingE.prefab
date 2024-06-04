@@ -392,7 +392,6 @@ MonoBehaviour:
   stimulusName: 
   instructions: 
   duration: 0
-  rotationHandle: {fileID: 0}
   scotomaHandler: {fileID: 0}
   scotoma: 0
   saveTracking: 1
@@ -406,7 +405,6 @@ MonoBehaviour:
   repetitionLimit: 0
   audioObject: {fileID: 8951486769909658832, guid: adb243460a067394fbffce5bd378e931,
     type: 3}
-  ps: {fileID: 0}
 --- !u!1 &4200568987015882290
 GameObject:
   m_ObjectHideFlags: 0

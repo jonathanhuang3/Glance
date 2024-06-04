@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
@@ -13,13 +14,13 @@ public class OptotypeData : Data
 {
     // Consider saving all textures used.
     public List<UserResponses> userResponses;
+    public float[] fractionVisible;
 }
 
 [System.Serializable]
 public class UserResponses
 {
-    public enum Orientation { Right, Down, Left, Up };
-    public Orientation orientation;
+    public string orientation;
     public string letter = "E";
     public float dispersionAmount;
     public float[] fractionVisible = new float[15];
@@ -76,29 +77,31 @@ public class TumblingOptotype : Stimulus
     // Letters to use are CDEFHKNPRUVZ
     public GameObject handle;
     public TextMeshProUGUI optotypeText;
-    public float tiling = 1.0f;
     public int repetitionLimit;
-    private int repetitionCount;
+    private int repetitionCount; // Total number of rotations completed
+    private int stateRepetitionLimit = 5; // Number of rotations per state
 
     public GameObject audioObject;
     private AudioSource audioData;
 
     private ParticleSystem scotomaPs; // particle system from scotoma set from scotomaHandler
     private ParticleSystem.ShapeModule shape;
+    private ParticleSystem.MainModule main;
     // MetaStimulus for this stimulus stores scotoma information, MetaStimulus.Scotoma.Grid, which is currently not being used.
     private enum ScotomaGrid { S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, NumStates }; // Corresponds to indices in masks. Finer modulation of noise occurs through `tiling`
     private ScotomaGrid state = ScotomaGrid.S0; // 1.9 - (state) * 0.1 = random dispersion of particles
-    private float minParticleDispersion = 0.4f;
-    private float maxParticleDispersion = 1.9f;
+    private float minParticleDispersion = 3000f; // 0.4f
+    private float maxParticleDispersion = 7000f; // 1.9f
     // Least to most difficult
     private int numStates = 16;
     private int numGroups = 4;
+    // Least to most difficult
     private List<float> particleDispersions = new List<float>();
     private List<List<float>> particleDispersionGroups = new List<List<float>>();
     // Move through noise states using BinSort type insertion algorithm, by lumping together groups of states
     // random dispersion from 1.9 to 0.4 in particle system. Step size of 0.1 for 4 groups of 4 states
     // Implement option for either optimized threshold calculation or sequential threshold calculation
-    private int groupsIndex = 2; // Start at the second group
+    private int groupsIndex = 0; // Will have to change to start in second group
     private int intraGroupIndex = 0; // Start at the first state in the group
     private enum ResponseQuality { Miss, FalsePositive, Correct, FalseNegative }; // A false positive is where the user guessed correctly by chance. A false negative would only make sense if the user knew the answer but pressed the wrong button
     private List<bool> responses = new List<bool>();
@@ -123,7 +126,7 @@ public class TumblingOptotype : Stimulus
         {
             scotomaPs = scotomaHandler.GetComponent<ScotomaHandler>().CurrentScotoma.GetComponent<ParticleSystem>();
             shape = scotomaPs.shape;
-            particleDispersions.AddRange(Enumerable.Range(0, numStates).Select(i => maxParticleDispersion - i * (maxParticleDispersion - minParticleDispersion) / (numStates - 1)));
+            particleDispersions.AddRange(Enumerable.Range(0, numStates).Select(i => minParticleDispersion + i * (maxParticleDispersion - minParticleDispersion) / (numStates - 1)));
             particleDispersionGroups.AddRange(Enumerable.Range(0, numGroups).Select(i => particleDispersions.Skip(i * numGroups).Take(numGroups).ToList()));
         }
     }
@@ -131,44 +134,54 @@ public class TumblingOptotype : Stimulus
     {
         base.Update();
         // Keep stimulus in front of user
-        Quaternion shiftRotation = this.headingRotation;
-        handle.transform.rotation = shiftRotation;
+        // Quaternion shiftRotation = this.headingRotation;
+        // handle.transform.rotation = shiftRotation;
 
-        optotypeText.color = Color.Lerp(optotypeText.color, new Color(optotypeText.color.r, optotypeText.color.g, optotypeText.color.b, 1f), (Time.time - timeOfResponse) / 0.5f);
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.G) || Input.GetKeyDown(KeyCode.Y))
         {
             correct = CheckDirection();
             responses.Add(correct);
-            deliberationTime = Time.time - timeOfResponse; // timeOfResponse is set in CheckDirection()
+            deliberationTime = Time.time - timeOfRotation; // timeOfRotation takes into account the pause before optotype is shown. timeOfResponse is set in CheckDirection()
             justAnswered = true;
         }
         // Split this up into two blocks, one for checking input and one for updating the stimulus only when the user has answered
         if (justAnswered)
         {
             string answer = correct ? "Correct" : "Incorrect";
-            Debug.Log($"{answer} - Intended Rotation {direction.ToString()} - Optotype Rotation {optotypeText.transform.rotation.eulerAngles.z}");
+            Debug.Log($"{answer} - Intended Rotation {direction.ToString()}");
 
             // Choose groupIndex based on correctness. A metric of correctness could take into account `correct`, time taken to answer, and known difiiulty of the current group
             // state = groups[groupsIndex][Random.Range(0, groups[groupsIndex].Length)];
             // float dispersion = CalculateDispersion(correct, deliberationTime, groupsIndex, intraGroupIndex);
             repetitionCount++;
-            this.ScotomaModulateOcclusion(correct);
-            optotypeText.transform.rotation = Quaternion.Lerp(optotypeText.transform.rotation, Quaternion.Euler(0, 0, RandomOptotypeRotation()), 1f);
+            // Change groupIndex and stateIndex every stateRepetitionLimit repetitions
+            if (repetitionCount % stateRepetitionLimit == 0)
+            {
+                intraGroupIndex = (intraGroupIndex + 1) % (numStates / numGroups);
+                if (intraGroupIndex == 0)
+                {
+                    groupsIndex = Mathf.Clamp(groupsIndex + 1, 0, numGroups - 1);
+                }
+                Debug.Log($"Moving to state: {intraGroupIndex} in group: {groupsIndex}. Repetition Count: {repetitionCount}");
+            }
+            Debug.Log($"Correct: {correct}, group: {groupsIndex}, sub-group: {intraGroupIndex}, Occlusion Amount: {particleDispersionGroups[groupsIndex][intraGroupIndex]}");
+            this.ScotomaModulateOcclusion(correct, particleDispersionGroups[groupsIndex][intraGroupIndex]);
+            optotypeText.transform.rotation = Quaternion.Lerp(optotypeText.transform.rotation, Quaternion.Euler(optotypeText.transform.rotation.eulerAngles.x, optotypeText.transform.rotation.eulerAngles.y, RandomOptotypeRotation()), 1f);
 
-            optotypeText.color = new Color(optotypeText.color.r, optotypeText.color.g, optotypeText.color.b, 0f); // Change alpha to hide optotype while particles re-emit, to avoid giving away optotype rotation
+            StartCoroutine(HideAndShowText());
             userResponses.Add(
                 new UserResponses()
                 {
-                    orientation = (UserResponses.Orientation)direction,
+                    orientation = direction.ToString(),
                     letter = optotypeText.text,
-                    dispersionAmount = shape.randomPositionAmount,
-                    fractionVisible = this.fractionVisible.TakeLast(15).ToArray(),
+                    dispersionAmount = main.maxParticles,
+                    fractionVisible = this.fractionVisible.TakeLast(15).Select(x => float.IsNaN(x) ? -1 : x).ToArray(),
                     response = correct,
                     timeOfResponse = timeOfResponse,
                     deliberationTime = deliberationTime,
                     timeOfRotation = timeOfRotation
                 });
-            audioData.Play();
+
             justAnswered = false;
         }
     }
@@ -202,6 +215,18 @@ public class TumblingOptotype : Stimulus
         int rotation = UnityEngine.Random.Range(0, angle.Length);
         direction = (Optotype)rotation;
         return angle[rotation];
+    }
+
+    IEnumerator HideAndShowText()
+    {
+        // Change alpha to hide optotype while particles re-emit, to avoid giving away optotype rotation
+        optotypeText.color = new Color(optotypeText.color.r, optotypeText.color.g, optotypeText.color.b, 0f);
+
+        yield return new WaitForSeconds(0.3f);
+
+        optotypeText.color = new Color(optotypeText.color.r, optotypeText.color.g, optotypeText.color.b, 1f);
+        timeOfRotation = Time.time;
+        audioData.Play();
     }
 
 
@@ -295,7 +320,7 @@ public class TumblingOptotype : Stimulus
 
     protected override bool ShouldEndStimulus()
     {
-        return repetitionCount >= particleDispersions.Count * 30; // 30 repetitions per state
+        return repetitionCount >= (particleDispersions.Count * stateRepetitionLimit) - 1; // stateRepetitionLimit repetitions per state
     }
 
     public override void SaveTrackingData(string stimulusName)
@@ -314,7 +339,8 @@ public class TumblingOptotype : Stimulus
                 rotatedGaze = this.rotatedGaze.ToArray(),
                 gazeRotations = this.gazeRotations.ToArray(),
                 gazeTimes = this.gazeTimes.ToArray(),
-                userResponses = userResponses
+                userResponses = userResponses,
+                fractionVisible = this.fractionVisible.Select(x => float.IsNaN(x) ? -1 : x).ToArray()
             };
             string json = JsonUtility.ToJson(optotypeData);
             System.IO.File.WriteAllText($"{this.storagePath}/{PlayerInfo.Instance.PlayerName}-{stimulusName}.json", json);
