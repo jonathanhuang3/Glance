@@ -52,7 +52,7 @@ public class QuickFOVandPPD : MonoBehaviour
 
 
         Debug.Log("Red pixels: " + string.Join(", ", redPixelCounts.Max()));
-        Debug.Log("White pixels: " + whitePixelCounts.Where(x => x > 0).Min());
+        Debug.Log("White pixels: " + whitePixelCounts.Where(x => x > 0).Max());
         // Encode texture into PNG
         byte[] bytes = tex.EncodeToPNG();
         System.IO.File.WriteAllBytes(Application.dataPath + "/Scripts/SavedScreen.png", bytes);

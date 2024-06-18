@@ -25,7 +25,7 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "ExperimentOrder", menuName = "ScriptableObjects/ExperimentOrder", order = 1)]
 public class ExperimentOrder : ScriptableObject
 {
-    public List<MetaStimulus> MetaStimuli { get; } = new List<MetaStimulus>()
+    public List<MetaStimulus> MetaStimuli { get; protected set; } = new List<MetaStimulus>()
     {
         new MetaStimulus
         {

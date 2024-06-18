@@ -9,9 +9,8 @@ public class Scotoma : MonoBehaviour
     public bool gazeContingent = false;
     protected float speed = 3f;
     public bool toggleMotionJitter = true;
-    public GameObject cameraRig;
 
-    public MetaStimulus.OKRDriver stimulusType;
+    public MetaStimulus.OKRDriver driver = MetaStimulus.OKRDriver.TumblingE;
     protected GazeUtility gazeUtility;
     protected Vector3 rayDirection { get; set; }
     protected Vector3 rayOrigin { get; set; }
@@ -20,14 +19,18 @@ public class Scotoma : MonoBehaviour
     {
         gazeUtility = new GazeUtility();
         Stimulus.ModulateScotomaOcclusion += ModulateOcclusion;
+        Stimulus.CycleScotomaOcclusion += CycleOcclusion;
+        ExperimentScheduler.StartDriver += SetOKRDriver;
     }
 
     void OnDisable()
     {
         Stimulus.ModulateScotomaOcclusion -= ModulateOcclusion;
+        Stimulus.CycleScotomaOcclusion -= CycleOcclusion;
+        ExperimentScheduler.StartDriver -= SetOKRDriver;
     }
 
-    protected void Update()
+    protected virtual void Update()
     {
         // Note that the heading rotation of the scotomas are conducted in the Stimulus class
         if (gazeContingent)
@@ -38,7 +41,13 @@ public class Scotoma : MonoBehaviour
             TrackGaze();
         }
 
-        if (toggleMotionJitter) transform.position = MotionJitter();
+        if (toggleMotionJitter) transform.position += MotionJitter();
+    }
+
+    protected virtual void SetOKRDriver(MetaStimulus.OKRDriver newDriver)
+    {
+        Debug.Log($"Driver switched to: {driver.ToString()}");
+        driver = newDriver;
     }
     /// <summary>
     /// Modulates the occlusion of the scene.
@@ -47,8 +56,8 @@ public class Scotoma : MonoBehaviour
     /// <param name="occlusionAmount">The amount of occlusion to apply.</param>
     protected virtual void ModulateOcclusion(bool correct, float occlusionAmount)
     {
-        // Occlude varying amounts of the scene by either changing scale or modifying shader (Scotoma specific)
-        // Generic type - either int or float
+        // Occlude varying amounts of the scene  either changing scale or modifying shader (Scotoma specific)
+        // Generic type - either int or 
     }
 
     /// <summary>
@@ -69,12 +78,11 @@ public class Scotoma : MonoBehaviour
     {
         // Jitter particles uniformly
         // shape.position = Vector3.Lerp(shape.position, new Vector3(Random.Range(-bound, bound), 0f, Random.Range(-bound, bound)), 0.1f);
-        float bound = 0.2f;
+        float bound = 0.25f;
         Vector3 translation = new Vector3(Random.Range(-bound, bound), Random.Range(-bound, bound), 0f) * Time.deltaTime;
-        Vector3 newPosition = transform.position + translation;
-        newPosition.x = Mathf.Clamp(newPosition.x, -bound, bound); // Keep within bounds
-        newPosition.y = Mathf.Clamp(newPosition.y, -bound, bound);
-        return newPosition;
+        translation.x = Mathf.Clamp(translation.x, -bound, bound); // Keep within bounds
+        translation.y = Mathf.Clamp(translation.y, -bound, bound);
+        return Random.insideUnitCircle * bound * Time.deltaTime;
     }
 
     /// <summary>

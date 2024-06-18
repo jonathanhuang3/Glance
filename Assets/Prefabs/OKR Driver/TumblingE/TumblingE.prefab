@@ -401,7 +401,6 @@ MonoBehaviour:
     type: 2}
   handle: {fileID: 0}
   optotypeText: {fileID: 4200568986804295418}
-  tiling: 1
   repetitionLimit: 0
   audioObject: {fileID: 8951486769909658832, guid: adb243460a067394fbffce5bd378e931,
     type: 3}

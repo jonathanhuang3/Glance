@@ -71,7 +71,7 @@ namespace Tobii.XR
         }
 
         /// <summary>
-        /// Calculates the rotation based on the heading direction.
+        /// Calculates the rotation towards the heading direction.
         /// </summary>
         /// <param name="forward">The forward direction.</param>
         /// <param name="up">The up direction.</param>
@@ -87,7 +87,7 @@ namespace Tobii.XR
         }
 
         /// <summary>
-        /// Calculates the rotation based on the gaze tracking direction.
+        /// Calculates the rotation towards the gaze tracking direction.
         /// </summary>
         /// <param name="forward">The forward direction.</param>
         /// <param name="up">The up direction.</param>

@@ -1,0 +1,21 @@
+#pragma kernel CSInit
+#pragma kernel CountWhitePixels
+
+RWStructuredBuffer<int> ResultBuffer;
+Texture2D InputTexture;
+
+[numthreads(1,1,1)]
+void CSInit (uint3 id : SV_DispatchThreadID)
+{
+    ResultBuffer[0] = 0;
+}
+
+[numthreads(8,8,1)]
+void CountWhitePixels (uint3 id : SV_DispatchThreadID)
+{
+    float4 color = InputTexture[id.xy];
+    if (color.r > 0.9f && color.g > 0.9f && color.b > 0.9f)
+    {
+        InterlockedAdd(ResultBuffer[0], 1);
+    }
+}

@@ -32,6 +32,10 @@ public class ExperimentScheduler : MonoBehaviour
     private DateTime experimentStartTime;
     private int currentStimulus = 0;
 
+    // Broadcasts
+    public delegate void NewOKRDriver(MetaStimulus.OKRDriver driver);
+    public static event NewOKRDriver StartDriver;
+
     void Start()
     {
         PlayerInfo.Initialize(playerName, playerID, experimentTag);
@@ -171,6 +175,7 @@ public class ExperimentScheduler : MonoBehaviour
             case MetaStimulus.OKRDriver.Dots:
                 ParticleController particleController = objectDriver.GetComponent<ParticleController>();
                 particleController.stimulusName = currentMetaStimulus.name;
+                particleController.driver = currentMetaStimulus.driver;
                 particleController.instructions = currentMetaStimulus.name;
                 particleController.duration = currentMetaStimulus.duration;
                 particleController.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
@@ -184,6 +189,7 @@ public class ExperimentScheduler : MonoBehaviour
             case MetaStimulus.OKRDriver.Unidirectional:
                 UnidirectionalHandler unidirectional = objectDriver.GetComponent<UnidirectionalHandler>();
                 unidirectional.stimulusName = currentMetaStimulus.name;
+                unidirectional.driver = currentMetaStimulus.driver;
                 unidirectional.instructions = currentMetaStimulus.name;
                 unidirectional.duration = currentMetaStimulus.duration;
                 unidirectional.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
@@ -195,6 +201,7 @@ public class ExperimentScheduler : MonoBehaviour
             case MetaStimulus.OKRDriver.COBRA:
                 Cobra cobra = objectDriver.GetComponent<Cobra>();
                 cobra.stimulusName = currentMetaStimulus.name;
+                cobra.driver = currentMetaStimulus.driver;
                 cobra.instructions = currentMetaStimulus.name;
                 cobra.repetitionLimit = currentMetaStimulus.repetitionLimit;
                 cobra.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
@@ -204,6 +211,7 @@ public class ExperimentScheduler : MonoBehaviour
             case MetaStimulus.OKRDriver.TumblingE:
                 TumblingOptotype tumblingOptotype = objectDriver.GetComponent<TumblingOptotype>();
                 tumblingOptotype.stimulusName = currentMetaStimulus.name;
+                tumblingOptotype.driver = currentMetaStimulus.driver;
                 tumblingOptotype.repetitionLimit = currentMetaStimulus.repetitionLimit;
                 tumblingOptotype.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
                 // Noise and initial optotype direction could be laid here
@@ -211,7 +219,7 @@ public class ExperimentScheduler : MonoBehaviour
                 objectDriver.SetActive(true);
                 break;
         }
-
+        // StartDriver?.Invoke(currentMetaStimulus.driver); // Invokes after objectDriver is set active.
         if (!repeatStimulus)
         {
             currentStimulus++;

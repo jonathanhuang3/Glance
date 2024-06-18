@@ -43,7 +43,8 @@ public class Stimulus : MonoBehaviour
     public delegate void ModulateScotomaOcclusionHandler(bool correct, float occlusionAmount); // Generic delegate for occlusion amount, to be passed either a float or an int
     public static event ModulateScotomaOcclusionHandler ModulateScotomaOcclusion;
     public delegate void CycleOcclusionHandler(int minParticles, int maxParticles, float timeframe, float pauseDuration);
-    public static event CycleOcclusionHandler CycleOcclusion;
+    public static event CycleOcclusionHandler CycleScotomaOcclusion;
+    public MetaStimulus.OKRDriver driver;
 
     // Stimulus associated objects
     public GameObject scotomaHandler;
@@ -66,6 +67,8 @@ public class Stimulus : MonoBehaviour
     public RenderTexture renderTexture; // Set to the default layer camera's target texture
     public RenderTexture stimulusRenderTexture; // Set to the stimulus layer camera's target texture
     private Texture2D tex;
+    public ComputeShader countWhitePixelsShader;
+    private ComputeBuffer resultBuffer;
     protected List<float> fractionVisible = new List<float>();
 
     // public void ShowInstructions()
@@ -126,6 +129,11 @@ public class Stimulus : MonoBehaviour
         TryToCalibrate();
     }
 
+    protected virtual void OnDisable()
+    {
+        if (resultBuffer != null) resultBuffer.Release();
+    }
+
     protected virtual void Update()
     {
         this.rayDirection = this.gazeUtility.GetGazeRay();
@@ -181,7 +189,8 @@ public class Stimulus : MonoBehaviour
             if (scotomaHandler != null)
             {
                 var handlerComponent = scotomaHandler.GetComponent<ScotomaHandler>();
-                handlerComponent.scotoma = (ScotomaHandler.Scotoma)this.scotoma;
+                handlerComponent.scotoma = (ScotomaHandler.ScotomaTypes)this.scotoma;
+                handlerComponent.driver = this.driver;
                 if (scotomaHandler.activeSelf)
                 {
                     handlerComponent.Initialize();
@@ -201,29 +210,44 @@ public class Stimulus : MonoBehaviour
 
     protected void ScotomaCycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
     {
-        CycleOcclusion?.Invoke(minParticles, maxParticles, timeframe, pauseDuration);
+        CycleScotomaOcclusion?.Invoke(minParticles, maxParticles, timeframe, pauseDuration);
     }
 
     private float PixelsVisible(RenderTexture rendTex)
     {
-        RenderTexture.active = rendTex;
-        tex.ReadPixels(new Rect(0, 0, rendTex.width, rendTex.height), 0, 0);
-        tex.Apply();
-        RenderTexture.active = null;
+        int kernelInit = countWhitePixelsShader.FindKernel("CSInit");
+        int kernelMain = countWhitePixelsShader.FindKernel("CountWhitePixels");
+        resultBuffer = new ComputeBuffer(1, sizeof(int));
+        int[] whitePixels = new int[1];
 
-        // List<Color> pixels = tex.GetPixels().ToList();
-        // int whitePixels = pixels.Count(pixel => pixel.r > 0.9f && pixel.g > 0.9f && pixel.b > 0.9f); // This is the same as the loop below, but the loop is probably faster
-        Color[] pixels = tex.GetPixels();
-        int whitePixels = 0;
-        foreach (Color pixel in pixels)
-        {
-            if (pixel.r > 0.9f && pixel.g > 0.9f && pixel.b > 0.9f)
-            {
-                whitePixels++;
-            }
-        }
+        countWhitePixelsShader.SetTexture(kernelInit, "InputTexture", rendTex);
+        countWhitePixelsShader.SetTexture(kernelMain, "InputTexture", rendTex);
+        countWhitePixelsShader.SetBuffer(kernelInit, "ResultBuffer", resultBuffer);
+        countWhitePixelsShader.SetBuffer(kernelMain, "ResultBuffer", resultBuffer);
+        countWhitePixelsShader.Dispatch(kernelInit, 1, 1, 1);
+        countWhitePixelsShader.Dispatch(kernelMain, rendTex.width / 8, rendTex.height / 8, 1);
 
-        return whitePixels;
+        resultBuffer.GetData(whitePixels);
+        resultBuffer.Release();
+        resultBuffer = null;
+
+        return (float)whitePixels[0];
+        // tex.ReadPixels(new Rect(0, 0, rendTex.width, rendTex.height), 0, 0);
+        // tex.Apply();
+        // RenderTexture.active = null;
+
+        // // List<Color> pixels = tex.GetPixels().ToList();
+        // // int whitePixels = pixels.Count(pixel => pixel.r > 0.9f && pixel.g > 0.9f && pixel.b > 0.9f); // This is the same as the loop below, but the loop is probably faster
+        // Color[] pixels = tex.GetPixels();
+        // int whitePixels = 0;
+        // foreach (Color pixel in pixels)
+        // {
+        //     if (pixel.r > 0.9f && pixel.g > 0.9f && pixel.b > 0.9f)
+        //     {
+        //         whitePixels++;
+        //     }
+        // }
+
     }
 
     protected void TryToCalibrate()

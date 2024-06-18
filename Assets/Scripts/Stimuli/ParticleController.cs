@@ -21,7 +21,7 @@ public class ParticleController : Stimulus
     private float[] _phase = new float[4];
     private List<float> dotsPhase = new List<float>();
     // For unidirectional case to replicate mouse stimulus
-    public bool unidirectional = false;
+    public bool unidirectional = true;
     public float defaultVelocity = 3f;
 
     // Direction parameters
@@ -64,7 +64,7 @@ public class ParticleController : Stimulus
             // Shape
             shapeModule.shapeType = ParticleSystemShapeType.Sphere;
             shapeModule.radius = 5f;
-            shapeModule.randomPositionAmount = 10f;
+            shapeModule.randomPositionAmount = 5f;
             shapeModule.scale = new Vector3(1, 0, 1); // 2D in xz plane
             // Velocity
             velocityOverLifetime.enabled = true;
@@ -74,11 +74,16 @@ public class ParticleController : Stimulus
         dotsFrequencies.AddRange(coeff.Select(c => c * _frequency));
     }
 
+    protected void Start()
+    {
+        // Executed after OnEnable
+        if (unidirectional) this.ScotomaCycleOcclusion(0, 100000, this.duration, 10f);
+    }
+
     protected override void Update()
     {
         base.Update();
 
-        if (unidirectional) this.ScotomaCycleOcclusion(0, 9000, this.duration, 1f);
         float v = unidirectional ? defaultVelocity : VelocityNonHarmonic(Time.time, dotsFrequencies, dotsPhase);
         Vector3 velocity = Vector3.zero;
 
