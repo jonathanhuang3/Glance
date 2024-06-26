@@ -10,20 +10,72 @@ public class DevCyclicOrder : ExperimentOrder
         MetaStimuli = new List<MetaStimulus>();
         MetaStimuli.Add(new MetaStimulus
         {
-            name = "Stimulus 1",
+            name = "Tumbling 1",
             driver = MetaStimulus.OKRDriver.TumblingE,
             scotoma = MetaStimulus.Scotoma.Cone,
-            repetitionLimit = 15,
+            repetitionLimit = 30,
             calibNeeded = false
         });
 
         MetaStimuli.Add(new MetaStimulus
         {
-            name = "Stimulus 2",
+            name = "OKR 1",
             driver = MetaStimulus.OKRDriver.Dots,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
+            contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.Cone,
-            repetitionLimit = 15,
-            calibNeeded = false
+            duration = 190f, //423f
+            numRepetitions = 2,
+            calibNeeded = true
+        });
+
+        MetaStimuli.Add(new MetaStimulus
+        {
+            name = "OKR 2",
+            driver = MetaStimulus.OKRDriver.Dots,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
+            contrast = MetaStimulus.Contrast.High,
+            scotoma = MetaStimulus.Scotoma.Cone,
+            duration = 190f, //423f
+            calibNeeded = true
+        });
+
+        MetaStimuli.Add(new MetaStimulus
+        {
+            name = "OKR 3",
+            driver = MetaStimulus.OKRDriver.Dots,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
+            contrast = MetaStimulus.Contrast.High,
+            scotoma = MetaStimulus.Scotoma.Cone,
+            duration = 190f, //423f
+            calibNeeded = true
+        });
+
+        MetaStimuli.Add(new MetaStimulus
+        {
+            name = "OKR 4",
+            driver = MetaStimulus.OKRDriver.Dots,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
+            contrast = MetaStimulus.Contrast.High,
+            scotoma = MetaStimulus.Scotoma.Cone,
+            duration = 190f, //423f
+            calibNeeded = true
+        });
+
+        MetaStimuli.Add(new MetaStimulus
+        {
+            name = "OKR 5",
+            driver = MetaStimulus.OKRDriver.Dots,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectionalDots = true,
+            contrast = MetaStimulus.Contrast.High,
+            scotoma = MetaStimulus.Scotoma.Cone,
+            duration = 190f, //423f
+            calibNeeded = true
         });
 
         // MetaStimuli[2] = new MetaStimulus

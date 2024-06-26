@@ -65,7 +65,7 @@ public class Scotoma : MonoBehaviour
     /// </summary>
     /// <param name="timeframe">The amount of time it takes to complete one cycle of occlusion</param>
     /// <param name="pauseDuration">The duration of the pause at minimum and maximum occlusions</param>
-    protected virtual void CycleOcclusion(int min, int max, float timeframe, float pauseDuration)
+    protected virtual void CycleOcclusion(int min, int max, float timeframe, float pauseDuration, int repetitions)
     {
 
     }

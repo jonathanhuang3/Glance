@@ -42,7 +42,7 @@ public class Stimulus : MonoBehaviour
     // Scotoma setup
     public delegate void ModulateScotomaOcclusionHandler(bool correct, float occlusionAmount); // Generic delegate for occlusion amount, to be passed either a float or an int
     public static event ModulateScotomaOcclusionHandler ModulateScotomaOcclusion;
-    public delegate void CycleOcclusionHandler(int minParticles, int maxParticles, float timeframe, float pauseDuration);
+    public delegate void CycleOcclusionHandler(int minParticles, int maxParticles, float timeframe, float pauseDuration, int repetitions);
     public static event CycleOcclusionHandler CycleScotomaOcclusion;
     public MetaStimulus.OKRDriver driver;
 
@@ -94,7 +94,7 @@ public class Stimulus : MonoBehaviour
 
     public void EndStimulus()
     {
-        scotomaHandler.SetActive(false);
+        if (scotomaHandler != null) scotomaHandler.SetActive(false);
         StimulusEnded?.Invoke(this.stimulusName);
     }
 
@@ -208,9 +208,9 @@ public class Stimulus : MonoBehaviour
         ModulateScotomaOcclusion?.Invoke(correct, occlusionAmount);
     }
 
-    protected void ScotomaCycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration)
+    protected void ScotomaCycleOcclusion(int minParticles, int maxParticles, float timeframe, float pauseDuration, int repetitions = 1)
     {
-        CycleScotomaOcclusion?.Invoke(minParticles, maxParticles, timeframe, pauseDuration);
+        CycleScotomaOcclusion?.Invoke(minParticles, maxParticles, timeframe, pauseDuration, repetitions);
     }
 
     private float PixelsVisible(RenderTexture rendTex)

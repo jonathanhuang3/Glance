@@ -22,6 +22,7 @@ public class ParticleController : Stimulus
     private List<float> dotsPhase = new List<float>();
     // For unidirectional case to replicate mouse stimulus
     public bool unidirectional = true;
+    public int timeRepetitions = 1;
     public float defaultVelocity = 3f;
 
     // Direction parameters
@@ -72,12 +73,13 @@ public class ParticleController : Stimulus
         }
         dotsPhase.AddRange(Enumerable.Range(0, _phase.Length).Select(_ => UnityEngine.Random.Range(0f, 2 * Mathf.PI)));
         dotsFrequencies.AddRange(coeff.Select(c => c * _frequency));
+
+        if (unidirectional) this.ScotomaCycleOcclusion(0, 30000, this.duration, 10f, timeRepetitions);
     }
 
     protected void Start()
     {
         // Executed after OnEnable
-        if (unidirectional) this.ScotomaCycleOcclusion(0, 100000, this.duration, 10f);
     }
 
     protected override void Update()

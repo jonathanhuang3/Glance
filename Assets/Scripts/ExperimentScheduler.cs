@@ -181,6 +181,7 @@ public class ExperimentScheduler : MonoBehaviour
                 particleController.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
                 particleController.movementDirection = (ParticleController.Direction)currentMetaStimulus.movementDirection;
                 particleController.unidirectional = currentMetaStimulus.unidirectionalDots;
+                particleController.timeRepetitions = currentMetaStimulus.numRepetitions;
                 particleController.contrast = (ParticleController.Contrast)currentMetaStimulus.contrast;
                 // Add cycle contrast toggle
                 particleController.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
@@ -333,9 +334,9 @@ public class ExperimentScheduler : MonoBehaviour
             .Where(stimulus =>
             {
                 var isSaved = savedStimuli.Contains(stimulus.name);
-                var hasFiles = Directory.EnumerateFileSystemEntries($"{playerData}/{stimulus.name}").Any();
+                // var hasFiles = Directory.EnumerateFileSystemEntries($"{playerData}/{stimulus.name}").Any();
 
-                return !isSaved || !hasFiles;
+                return !isSaved || !Directory.EnumerateFileSystemEntries($"{playerData}/{stimulus.name}").Any();
             });
         // Get stimuli names as string
         List<string> unsavedStimuli = unsavedStimuliQuery
