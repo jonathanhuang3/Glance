@@ -89,10 +89,10 @@ public class ConeScotoma : Scotoma
 
         float time1 = 0;
         float time2 = time1 + normalizedPause;
-        float time3 = time2 + (normalizedRamp); // Ping Pong requires that the curve is symmetric about the midpoint
+        float time3 = time2 + normalizedRamp; // Ping Pong requires that the curve is symmetric about the midpoint
         // float time3 = time2 + normalizedRampSqrt;
         // float time4 = time3 + normalizedRampBoost;
-
+        Debug.Log($"total time: {timeframe} and rampTime: {rampTime}");
 
         SetupParticleSystem(timeframe, pauseDuration + rampTime); // Set scale so that normalized time in animation curve is fraction of duration
 

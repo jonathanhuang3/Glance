@@ -169,6 +169,7 @@ public class TumblingOptotype : Stimulus
         base.Update();
 
         fractionVisibleState.Add(this.fractionVisible.LastOrDefault().Equals(float.NaN) ? -1 : this.fractionVisible.LastOrDefault());
+        if (Time.frameCount % 100 == 0) Debug.Log($"Current visible fraction: {this.fractionVisible.LastOrDefault()}");
         if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.G) || Input.GetKeyDown(KeyCode.Y))
         {
             correct = CheckDirection();
@@ -205,8 +206,7 @@ public class TumblingOptotype : Stimulus
             float rnd = RandomOptotypeRotation();
             // Debug.Log($"angle: {rnd} and after lerp: {Quaternion.Lerp(optotypeText.transform.rotation, Quaternion.Euler(optotypeText.transform.rotation.eulerAngles.x, optotypeText.transform.rotation.eulerAngles.y, rnd), 1f).eulerAngles.z}");
             optotypeText.transform.rotation = Quaternion.Lerp(optotypeText.transform.rotation, Quaternion.Euler(optotypeText.transform.rotation.eulerAngles.x, optotypeText.transform.rotation.eulerAngles.y, rnd), 1f);
-            // Debug.Log($"visible fraction: {}");
-            StartCoroutine(HideAndShowText());
+            Debug.Log($"Allocated fraction: {string.Join(",", fractionVisibleState.TakeLast(5).ToList())}");
             userResponses.Add(
                 new UserResponses()
                 {
@@ -220,6 +220,7 @@ public class TumblingOptotype : Stimulus
                     timeOfRotation = timeOfRotation
                 });
 
+            StartCoroutine(HideAndShowText());
             justAnswered = false;
         }
     }

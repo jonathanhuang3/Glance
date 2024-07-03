@@ -26,7 +26,7 @@ public class DevCyclicOrder : ExperimentOrder
             contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.Cone,
             duration = 190f, //423f
-            numRepetitions = 2,
+            numRepetitions = 1,
             calibNeeded = true
         });
 
