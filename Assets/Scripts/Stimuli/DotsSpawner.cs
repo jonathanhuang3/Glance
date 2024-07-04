@@ -11,6 +11,7 @@ public class DotsData : Data
     public float[] dotsFrequencies;
     public float[] dotsPhase;
     public List<StepData> stepData;
+    public List<Color> contrasts;
     public List<float> fractionVisible;
 
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public class UnidirectionalData : Data
 {
-    public Vector3[] fixationSizes;
+    public List<Vector3> fixationSizes;
 
 }
 public class UnidirectionalHandler : Stimulus
@@ -16,8 +16,8 @@ public class UnidirectionalHandler : Stimulus
     public Direction motion = Direction.Up;
 
     public bool fixationPoint = false; // For OKR Suppression stimulus
-    public GameObject fixationRegionPrefab;
-    private GameObject fixationPointPrefab;
+    // public GameObject fixationRegionPrefab;
+    // private GameObject fixationPointPrefab;
     private List<Vector3> fixationSizes = new List<Vector3>();
     private Vector3 fixationPointScale;
     public Vector3 minimumRegionSize;
@@ -26,22 +26,11 @@ public class UnidirectionalHandler : Stimulus
     protected override void OnEnable()
     {
         base.OnEnable();
-        if (fixationRegionPrefab != null)
-        {
-            fixationRegionPrefab.SetActive(fixationPoint);
-            fixationPointPrefab = fixationRegionPrefab.transform.GetChild(0).gameObject;
-            fixationPointScale = fixationPointPrefab.transform.localScale;
-            maximumRegionSize = fixationRegionPrefab.transform.localScale * 40.0f;
-            minimumRegionSize = maximumRegionSize * 0.001f;
-            fixationRegionPrefab.transform.localScale = maximumRegionSize;
-        }
+
     }
 
     protected override void Update()
     {
-
-        var theater = GameObject.Find("Unidirectional/Theater");
-        // theater.transform.rotation = this.headingRotation;
 
         // Set the speed variable of the shader
         theater.GetComponent<Renderer>().material.SetFloat("_Speed", speed);

@@ -34,9 +34,10 @@ public class ParticleController : Stimulus
     public Contrast contrast = Contrast.High;
     private List<Color> colors = new List<Color>()
     {
-        new Color32(60,60,60,0), // Low contrast
-        Color.white // High contrast
+        Color.white, // High contrast
+        new Color32(60,60,60,0) // Should be background color
     };
+    private List<Color> colorDisplayed = new List<Color>();
     private List<Color> stepContrasts = new List<Color>()
     {
         // Steps will be filled in programmatically with GenerateStepContrast()
@@ -70,6 +71,8 @@ public class ParticleController : Stimulus
             // Velocity
             velocityOverLifetime.enabled = true;
             velocityOverLifetime.space = ParticleSystemSimulationSpace.Local;
+
+
         }
         dotsPhase.AddRange(Enumerable.Range(0, _phase.Length).Select(_ => UnityEngine.Random.Range(0f, 2 * Mathf.PI)));
         dotsFrequencies.AddRange(coeff.Select(c => c * _frequency));
@@ -104,12 +107,24 @@ public class ParticleController : Stimulus
         velocityOverLifetime.x = velocity.x;
         velocityOverLifetime.y = velocity.y; // In world space, y is upwards
         velocityOverLifetime.z = velocity.z;
+
+        if (cycleContrast)
+        {
+            ps.GetComponent<ParticleSystemRenderer>().material.color = CycleContrast();
+        }
     }
 
     private float VelocityNonHarmonic(float t, List<float> frequencies, List<float> phases)
     {
         float velocity = frequencies.Select((f, i) => Mathf.Sin(f * t - phases[i])).Sum();
         return amplitude * velocity;
+    }
+
+    private Color CycleContrast()
+    {
+        Color interpColor = Color.Lerp(colors[0], colors[1], Mathf.PingPong(Time.time, (this.duration / 2)));
+        colorDisplayed.Add(interpColor);
+        return interpColor;
     }
 
     private Color StepContrast()
@@ -199,7 +214,8 @@ public class ParticleController : Stimulus
                 gazeTimes = this.gazeTimes.ToArray(),
                 dotsFrequencies = this.dotsFrequencies.ToArray(),
                 dotsPhase = this.dotsPhase.ToArray(),
-                stepData = cycleContrast ? steps : null,
+                contrasts = (colorDisplayed != null) ? colorDisplayed : null,
+                stepData = (cycleContrast && steps != null) ? steps : null,
                 fractionVisible = this.scotoma != Scotoma.None ? this.fractionVisible : null
             };
 

@@ -275,6 +275,8 @@ public class Stimulus : MonoBehaviour
             System.IO.File.WriteAllLines($"{this.storagePath}/{rotatedGazeFile}", ListToString<Vector3>(this.rotatedGaze));
             System.IO.File.WriteAllLines($"{this.storagePath}/{rotationsForGazeFile}", ListToString<Quaternion>(this.gazeRotations));
             System.IO.File.WriteAllLines($"{this.storagePath}/{timeFile}", ListToString<float>(this.gazeTimes));
+
+
         }
     }
 
