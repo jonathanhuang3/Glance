@@ -12,7 +12,7 @@ public class QuickFOVandPPD : MonoBehaviour
         float aspectRatio = Camera.main.aspect;
         float horizontalFOV = Camera.main.fieldOfView * aspectRatio;
         float pixelsPerDegreeHorizontal = Screen.width / horizontalFOV;
-        Debug.Log("Horizontal Pixels per degree: " + pixelsPerDegreeHorizontal + " And FOV: " + horizontalFOV); // 9.15 ppd and 104.2623 FOV
+        Debug.Log("Right Pixels per degree: " + pixelsPerDegreeHorizontal + " And FOV: " + horizontalFOV); // 9.15 ppd and 104.2623 FOV
         Debug.Log("Vertical Pixels per degree: " + Screen.height / Camera.main.fieldOfView + " And FOV: " + Camera.main.fieldOfView); // 9.15 ppd and 60 FOV
         Debug.Log("Screen width: " + Screen.width + " Screen height: " + Screen.height + " All Camera Count: " + Camera.allCamerasCount); // 954 x 549 and 1
 

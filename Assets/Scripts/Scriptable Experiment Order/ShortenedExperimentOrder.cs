@@ -55,7 +55,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
                 {
                     name = "Stimulus 5",
                     driver = MetaStimulus.OKRDriver.Dots,
-                    movementDirection = MetaStimulus.Direction.Horizontal,
+                    movementDirection = MetaStimulus.Direction.Right,
                     contrast = MetaStimulus.Contrast.High,
                     scotoma = MetaStimulus.Scotoma.None,
                     duration = 20f,
@@ -110,7 +110,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
                     scotoma = MetaStimulus.Scotoma.None,
                     duration = 10f,
                     calibNeeded = true,
-                    fixationPoint = false
+                    fixate = false
                 },
                 new MetaStimulus
                 {
@@ -121,7 +121,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
                     scotoma = MetaStimulus.Scotoma.None,
                     duration = 10f,
                     calibNeeded = false,
-                    fixationPoint = false
+                    fixate = false
                 },
                 new MetaStimulus
                 {
@@ -132,7 +132,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
                     scotoma = MetaStimulus.Scotoma.None,
                     duration = 10f,
                     calibNeeded = false,
-                    fixationPoint = true
+                    fixate = true
                 },
                 new MetaStimulus
                 {
@@ -143,7 +143,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
                     scotoma = MetaStimulus.Scotoma.None,
                     duration = 10f,
                     calibNeeded = false,
-                    fixationPoint = true
+                    fixate = true
                 },
                 new MetaStimulus
                 {
@@ -166,7 +166,7 @@ public class ShortenedExperimentOrder : ExperimentOrder
     //     ("Stimulus 2", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Diagonal, MetaStimulus.Contrast.Low, MetaStimulus.Scotoma.None, 190f, false),
     //     ("Stimulus 3", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.Cone, 190f, false),
     //     ("Stimulus 4", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.Low, MetaStimulus.Scotoma.None, 190f, false),
-    //     ("Stimulus 5", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Horizontal, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, true),
+    //     ("Stimulus 5", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Right, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, true),
     //     ("Stimulus 6", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.Central, 190f, false),
     //     ("Stimulus 7", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Diagonal, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, false),
     //     ("Stimulus 8", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, false),

@@ -8,14 +8,14 @@ using System.Collections.Generic;
 //     public string name;
 //     public enum OKRDriver { Dots, Unidirectional, COBRA };
 //     public OKRDriver driver = OKRDriver.Dots;
-//     public enum Direction { Up, Diagonal, Horizontal, Down }
+//     public enum Direction { Up, Diagonal, Right, Left, Down }
 //     public Direction movementDirection = Direction.Up;
 //     public enum Contrast { Low, High }
 //     public Contrast contrast = Contrast.High;
 
 //     public enum Scotoma { None, Cone, Central, Peripheral };
 //     public Scotoma scotoma = Scotoma.None;
-//     public bool fixationPoint = false; // For OKR Suppression stimulus
+//     public bool fixate = false; // For OKR Suppression stimulus
 
 //     public float duration; // in seconds
 //     public bool calibNeeded;
@@ -71,7 +71,7 @@ public class ExperimentOrder : ScriptableObject
         {
             name = "Stimulus 5",
             driver = MetaStimulus.OKRDriver.Dots,
-            movementDirection = MetaStimulus.Direction.Horizontal,
+            movementDirection = MetaStimulus.Direction.Right,
             contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.None,
             duration = 190f,
@@ -126,7 +126,7 @@ public class ExperimentOrder : ScriptableObject
             scotoma = MetaStimulus.Scotoma.None,
             duration = 30f,
             calibNeeded = true,
-            fixationPoint = false
+            fixate = false
         },
         new MetaStimulus
         {
@@ -137,7 +137,7 @@ public class ExperimentOrder : ScriptableObject
             scotoma = MetaStimulus.Scotoma.None,
             duration = 30f,
             calibNeeded = false,
-            fixationPoint = false
+            fixate = false
         },
         new MetaStimulus
         {
@@ -148,7 +148,7 @@ public class ExperimentOrder : ScriptableObject
             scotoma = MetaStimulus.Scotoma.None,
             duration = 30f,
             calibNeeded = false,
-            fixationPoint = true
+            fixate = true
         },
         new MetaStimulus
         {
@@ -159,7 +159,7 @@ public class ExperimentOrder : ScriptableObject
             scotoma = MetaStimulus.Scotoma.None,
             duration = 30f,
             calibNeeded = false,
-            fixationPoint = true
+            fixate = true
         },
         new MetaStimulus
         {
@@ -179,7 +179,7 @@ public class ExperimentOrder : ScriptableObject
     //     ("Stimulus 2", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Diagonal, MetaStimulus.Contrast.Low, MetaStimulus.Scotoma.None, 190f, false),
     //     ("Stimulus 3", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.Cone, 190f, false),
     //     ("Stimulus 4", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.Low, MetaStimulus.Scotoma.None, 190f, false),
-    //     ("Stimulus 5", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Horizontal, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, true),
+    //     ("Stimulus 5", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Right, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, true),
     //     ("Stimulus 6", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.Central, 190f, false),
     //     ("Stimulus 7", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Diagonal, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, false),
     //     ("Stimulus 8", MetaStimulus.OKRDriver.Dots, MetaStimulus.Direction.Up, MetaStimulus.Contrast.High, MetaStimulus.Scotoma.None, 190f, false),

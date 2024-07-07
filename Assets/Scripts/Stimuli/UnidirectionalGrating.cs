@@ -16,7 +16,7 @@ public class UnidirectionalGrating : Stimulus
     public float speed = 22f;
     public float spatialFrequency = 10f;
 
-    public GameObject fixationPoint;
+    public GameObject fixate;
     private float scaleTime;
 
     private List<float> fixationSizes = new List<float>();
@@ -27,10 +27,12 @@ public class UnidirectionalGrating : Stimulus
         theater.GetComponent<Renderer>().material.SetFloat("_SpatialFrequency", spatialFrequency);
     }
 
-    void Update()
+    protected override void Update()
     {
+
         scaleTime += Time.deltaTime;
-        fixationPoint.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 0), Vector3.zero, scaleTime / this.duration);
+        fixate.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 0), Vector3.zero, scaleTime / this.duration);
+        base.Update();
     }
 
     public override void SaveTrackingData(string stimulusName)

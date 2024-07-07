@@ -6,17 +6,6 @@ using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
-public class DotsData : Data
-{
-    public float[] dotsFrequencies;
-    public float[] dotsPhase;
-    public List<StepData> stepData;
-    public List<Color> contrasts;
-    public List<float> fractionVisible;
-
-}
-
-[System.Serializable]
 public class StepData
 {
     public float stepStart = -1f;
@@ -34,7 +23,7 @@ public class DotsSpawner : Stimulus
     [Range(0.01f, 0.3f)]
     public float flickerInterval = 0.1f;
 
-    public enum Direction { Up, Diagonal, Horizontal, Down }
+    public enum Direction { Up, Diagonal, Right, Left, Down }
     public Direction movementDirection = Direction.Up;
 
     public enum Contrast { Low, High, Cycle }
@@ -197,7 +186,7 @@ public class DotsSpawner : Stimulus
                     case Direction.Diagonal:
                         velocity = new Vector3(vx, vx, 0) * MathF.Sqrt(2) / 2f; // normalize based on 1-1-sqrt(2) triangle
                         break;
-                    case Direction.Horizontal:
+                    case Direction.Right:
                         velocity = new Vector3(vx, 0, 0);
                         break;
                 }

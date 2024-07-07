@@ -6,46 +6,48 @@ using UnityEngine;
 [System.Serializable]
 public class UnidirectionalData : Data
 {
-    public List<Vector3> fixationSizes;
+    public Vector3[] fixationSizes;
 
 }
 public class UnidirectionalHandler : Stimulus
 {
-    public float speed = 0.1f;
+    public float amplitude = 0.5f;
+    public float spatialFrequency = 25f;
     public enum Direction { Up, Down };
     public Direction motion = Direction.Up;
+    public GameObject theater;
+    public GameObject fixationPointPrefab;
+    public Vector3 miniminumPointSize;
+    public Vector3 maximumPointSize;
+    private float scaleVelocity;
 
-    public bool fixationPoint = false; // For OKR Suppression stimulus
-    // public GameObject fixationRegionPrefab;
-    // private GameObject fixationPointPrefab;
+    public bool fixate = false; // For OKR Suppression stimulus
     private List<Vector3> fixationSizes = new List<Vector3>();
     private Vector3 fixationPointScale;
-    public Vector3 minimumRegionSize;
-    public Vector3 maximumRegionSize;
 
     protected override void OnEnable()
     {
         base.OnEnable();
-
     }
 
     protected override void Update()
     {
+        // theater.transform.rotation = this.headingRotation;
 
-        // Set the speed variable of the shader
-        theater.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
+        // Set the amplitude of movement of the shader
+        theater.GetComponent<Renderer>().material.SetFloat("_Amplitude", amplitude);
+        theater.GetComponent<Renderer>().material.SetFloat("_SpatialFrequency", spatialFrequency);
 
         // Set the direction variable of the shader
-        bool up = (motion == Direction.Up);
-        float upValue = up ? 1.0f : 0.0f;
-        theater.GetComponent<Renderer>().material.SetFloat("_movingUp", upValue);
+        bool up = motion == Direction.Up;
+        theater.GetComponent<Renderer>().material.SetInt("_MovingDown", up ? 0 : 1);
 
         // Lerp the fixation point size
-        if (fixationPoint)
+        if (fixate)
         {
-            fixationRegionPrefab.transform.localScale = LerpFixationPointSize();
-            fixationSizes.Add(fixationRegionPrefab.transform.localScale);
-            fixationPointPrefab.transform.localScale = fixationPointScale;
+            Vector3 size = Vector3.Lerp(maximumPointSize, miniminumPointSize, Mathf.SmoothDamp(0, 1, ref scaleVelocity, this.duration));
+            fixationPointPrefab.transform.localScale = size;
+            fixationSizes.Add(size);
         }
         base.Update(); // Added at end to avoid null reference when at the top.
 
@@ -56,7 +58,7 @@ public class UnidirectionalHandler : Stimulus
         float asymptote = this.duration + 5f;
         float nonlinearLerp = (asymptote * Time.time) / (Time.time + 7f); // (t)/(t+1) slows down lerp near the end
         Debug.Log(nonlinearLerp / asymptote);
-        Vector3 size = Vector3.Lerp(maximumRegionSize, minimumRegionSize, nonlinearLerp / this.duration);
+        Vector3 size = Vector3.Lerp(maximumPointSize, miniminumPointSize, nonlinearLerp / this.duration);
         return size;
     }
 

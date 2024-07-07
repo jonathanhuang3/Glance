@@ -5,6 +5,18 @@ using System;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
+public class DotsData : Data
+{
+    public string direction;
+    public float[] dotsFrequencies;
+    public float[] dotsPhase;
+    public List<StepData> stepData;
+    public List<Color> contrasts;
+    public List<float> fractionVisible;
+
+}
+
 public class ParticleController : Stimulus
 {
     // Particle system
@@ -13,6 +25,7 @@ public class ParticleController : Stimulus
     private ParticleSystem.VelocityOverLifetimeModule velocityOverLifetime;
     private ParticleSystem.ShapeModule shapeModule;
     private ParticleSystem.EmissionModule emissionModule;
+    private ParticleSystem.MainModule mainModule;
 
     // Velocity parameters
     private float _frequency = 2 * Mathf.PI / 15f;
@@ -21,12 +34,12 @@ public class ParticleController : Stimulus
     private float[] _phase = new float[4];
     private List<float> dotsPhase = new List<float>();
     // For unidirectional case to replicate mouse stimulus
-    public bool unidirectional = true;
+    public bool unidirectional = false;
     public int timeRepetitions = 1;
     public float defaultVelocity = 3f;
 
     // Direction parameters
-    public enum Direction { Up, Diagonal, Horizontal, Down }
+    public enum Direction { Up, Diagonal, Right, Left, Down }
     public Direction movementDirection = Direction.Up;
 
     // Contrast parameters
@@ -37,6 +50,9 @@ public class ParticleController : Stimulus
         Color.white, // High contrast
         new Color32(60,60,60,0) // Should be background color
     };
+
+    public bool fixate;
+    public GameObject fixationPrefab;
     private List<Color> colorDisplayed = new List<Color>();
     private List<Color> stepContrasts = new List<Color>()
     {
@@ -51,33 +67,57 @@ public class ParticleController : Stimulus
     private float stepDuration;
     private bool stepDown = false;
     private Color gray;
-    public bool cycleContrast = false; // When toggled, ignore contrast and cycle through Lerp from 0 to 1
+    private float contrastPause = 5f;
+    public bool cycleScotoma = false;
+    private bool cycleContrast = false; // When toggled, ignore contrast and cycle through Lerp from 0 to 1
 
     protected override void OnEnable()
     {
         base.OnEnable();
         if (ps != null)
         {
-            emissionModule = ps.emission;
-            shapeModule = ps.shape;
-            velocityOverLifetime = ps.velocityOverLifetime;
-            // Emission
-            emissionModule.rateOverTime = 1000f;
-            // Shape
-            shapeModule.shapeType = ParticleSystemShapeType.Sphere;
-            shapeModule.radius = 5f;
-            shapeModule.randomPositionAmount = 5f;
-            shapeModule.scale = new Vector3(1, 0, 1); // 2D in xz plane
-            // Velocity
-            velocityOverLifetime.enabled = true;
-            velocityOverLifetime.space = ParticleSystemSimulationSpace.Local;
-
+            SetupParticleSystem();
 
         }
         dotsPhase.AddRange(Enumerable.Range(0, _phase.Length).Select(_ => UnityEngine.Random.Range(0f, 2 * Mathf.PI)));
         dotsFrequencies.AddRange(coeff.Select(c => c * _frequency));
 
-        if (unidirectional) this.ScotomaCycleOcclusion(0, 30000, this.duration, 10f, timeRepetitions);
+        if (cycleScotoma) this.ScotomaCycleOcclusion(0, 30000, this.duration, 10f, timeRepetitions);
+
+        cycleContrast = contrast == Contrast.Cycle;
+        fixate = scotoma == Scotoma.Fixation;
+        fixationPrefab.SetActive(fixate);
+        fixationPrefab.transform.localScale = new Vector3(1, 1, 0);
+        rampTimeAlive = 0;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        fixationPrefab.SetActive(false);
+    }
+
+    void SetupParticleSystem()
+    {
+        ps.Clear();
+        mainModule = ps.main;
+        emissionModule = ps.emission;
+        shapeModule = ps.shape;
+        velocityOverLifetime = ps.velocityOverLifetime;
+        // Main
+        // mainModule.startColor = contrast != Contrast.Cycle ? colors[(int)contrast] : Color.white;
+        ps.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+        // Emission
+        emissionModule.rateOverTime = 1000f;
+        // Shape
+        shapeModule.shapeType = ParticleSystemShapeType.Sphere;
+        shapeModule.radius = 5f;
+        shapeModule.randomPositionAmount = 5f;
+        shapeModule.scale = new Vector3(1, 0, 1); // 2D in xz plane
+
+        velocityOverLifetime.enabled = true; // Velocity
+        velocityOverLifetime.space = ParticleSystemSimulationSpace.Local;
+        ps.Play();
     }
 
     protected void Start()
@@ -97,20 +137,33 @@ public class ParticleController : Stimulus
             case Direction.Up:
                 velocity = new Vector3(0, 0, v); // z is up for the particle system, due to its initial rotation and local space
                 break;
+            case Direction.Down:
+                velocity = new Vector3(0, 0, -v);
+                break;
             case Direction.Diagonal:
                 velocity = new Vector3(v, 0, v) * MathF.Sqrt(2) / 2f; // normalize based on 1-1-sqrt(2) triangle
                 break;
-            case Direction.Horizontal:
+            case Direction.Right:
                 velocity = new Vector3(v, 0, 0);
+                break;
+            case Direction.Left:
+                velocity = new Vector3(-v, 0, 0);
                 break;
         }
         velocityOverLifetime.x = velocity.x;
         velocityOverLifetime.y = velocity.y; // In world space, y is upwards
         velocityOverLifetime.z = velocity.z;
 
+        if (cycleContrast || fixate) rampTimeAlive += Time.deltaTime;
         if (cycleContrast)
         {
-            ps.GetComponent<ParticleSystemRenderer>().material.color = CycleContrast();
+            // rampTimeAlive += Time.deltaTime;
+            StartCoroutine(CycleContrast());
+        }
+
+        if (fixate)
+        {
+            fixationPrefab.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 0), Vector3.zero, NonlinearProgress(rampTimeAlive / (this.duration + 2f)));
         }
     }
 
@@ -120,11 +173,60 @@ public class ParticleController : Stimulus
         return amplitude * velocity;
     }
 
-    private Color CycleContrast()
+    IEnumerator CycleContrast()
     {
-        Color interpColor = Color.Lerp(colors[0], colors[1], Mathf.PingPong(Time.time, (this.duration / 2)));
-        colorDisplayed.Add(interpColor);
-        return interpColor;
+        // float progress = rampTimeAlive / ((this.duration - contrastPause) / 2);
+        // Color interpColor;
+        // if (progress <= 1)
+        // {
+        //     interpColor = Color.Lerp(colors[0], colors[1], Mathf.SmoothDamp(0, 1, ref cycleVelocity, progress));
+        //     colorDisplayed.Add(interpColor);
+        //     ps.GetComponent<Renderer>().material.color = interpColor;
+        //     yield return null;
+
+        // }
+        // yield return new WaitForSeconds(contrastPause);
+        // rampTimeAlive = 0;
+
+        // // interpColor = Color.Lerp(colors[0], colors[1], Mathf.SmoothDamp(1, 0, ref cycleVelocity, progress));
+        // interpColor = Color.Lerp(colors[0], colors[1], Mathf.PingPong(Time.time /  progress));
+        // colorDisplayed.Add(interpColor);
+        // ps.GetComponent<Renderer>().material.color = interpColor;
+        // yield return null;
+
+        while (rampTimeAlive < ((duration - contrastPause) / 2))
+        {
+
+            // float pingPong = Mathf.PingPong(Time.time / ((duration - contrastPause) / 2), 1);
+            Color interpColor = Color.Lerp(Color.white, colors[1], rampTimeAlive / ((duration - contrastPause) / 2));
+            ps.GetComponent<Renderer>().material.color = interpColor;
+            // ps.GetComponent<Renderer>().material.SetColor("_Color", interpColor);
+            yield return null;
+        }
+
+        // Plateau
+        ps.GetComponent<Renderer>().material.color = colors[1];
+        // ps.GetComponent<Renderer>().material.SetColor("_Color", colors[1]);
+        yield return new WaitForSeconds(contrastPause);
+        rampTimeAlive = 0;
+
+        while (rampTimeAlive < duration)
+        {
+
+            // float pingPong = Mathf.PingPong(Time.time / ((duration - contrastPause) / 2), 1);
+            Color interpColor = Color.Lerp(colors[1], Color.white, rampTimeAlive / ((duration - contrastPause) / 2));
+            ps.GetComponent<Renderer>().material.color = interpColor;
+            // ps.GetComponent<Renderer>().material.SetColor("_Color", interpColor);
+            yield return null;
+        }
+
+    }
+
+    private float NonlinearProgress(float currentProgress)
+    {
+        //Mathf.PingPong(Time.time / halfway, 1)
+        float progress = Mathf.Lerp(0, 2 * Mathf.PI, currentProgress);
+        return Mathf.Sin(progress / 4);
     }
 
     private Color StepContrast()
@@ -200,43 +302,51 @@ public class ParticleController : Stimulus
 
     public override void SaveTrackingData(string stimulusName)
     {
-        try
+        if (this.saveTracking)
         {
-            DotsData data = new DotsData()
+            try
             {
-                playerName = PlayerInfo.Instance.PlayerName,
-                playerID = PlayerInfo.Instance.PlayerID,
-                stimulusName = stimulusName,
-                duration = this.duration,
-                gazePositions = this.gazePositions.ToArray(),
-                rotatedGaze = this.rotatedGaze.ToArray(),
-                gazeRotations = this.gazeRotations.ToArray(),
-                gazeTimes = this.gazeTimes.ToArray(),
-                dotsFrequencies = this.dotsFrequencies.ToArray(),
-                dotsPhase = this.dotsPhase.ToArray(),
-                contrasts = (colorDisplayed != null) ? colorDisplayed : null,
-                stepData = (cycleContrast && steps != null) ? steps : null,
-                fractionVisible = this.scotoma != Scotoma.None ? this.fractionVisible : null
-            };
+                DotsData data = new DotsData()
+                {
+                    playerName = PlayerInfo.Instance.PlayerName,
+                    playerID = PlayerInfo.Instance.PlayerID,
+                    stimulusName = stimulusName,
+                    direction = this.movementDirection.ToString(),
+                    duration = this.duration,
+                    gazePositions = this.gazePositions.ToArray(),
+                    rotatedGaze = this.rotatedGaze.ToArray(),
+                    gazeRotations = this.gazeRotations.ToArray(),
+                    gazeTimes = this.gazeTimes.ToArray(),
+                    invalidGazetimes = this.invalidGazeTimes.ToArray(),
+                    dotsFrequencies = this.dotsFrequencies.ToArray(),
+                    dotsPhase = this.dotsPhase.ToArray(),
+                    contrasts = (colorDisplayed != null) ? colorDisplayed : null,
+                    stepData = (cycleContrast && steps != null) ? steps : null,
+                    fractionVisible = this.scotoma != Scotoma.None ? this.fractionVisible : null
+                };
 
-            base.SaveTrackingData(stimulusName);
+                base.SaveTrackingData(stimulusName);
 
-            System.IO.File.WriteAllLines($"{this.storagePath}/dotsFrequency.txt", this.ListToString<float>(this.dotsFrequencies));
-            System.IO.File.WriteAllLines($"{this.storagePath}/dotsPhase.txt", this.ListToString<float>(this.dotsPhase));
-            if (cycleContrast)
-            {
-                System.IO.File.WriteAllLines($"{this.storagePath}/contrastSteps.txt", this.ListToString<Color>(stepContrasts));
+                System.IO.File.WriteAllLines($"{this.storagePath}/dotsFrequency.txt", this.ListToString<float>(this.dotsFrequencies));
+                System.IO.File.WriteAllLines($"{this.storagePath}/dotsPhase.txt", this.ListToString<float>(this.dotsPhase));
+                if (cycleContrast)
+                {
+                    System.IO.File.WriteAllLines($"{this.storagePath}/contrastSteps.txt", this.ListToString<Color>(stepContrasts));
+                }
+
+                string dataJson = JsonUtility.ToJson(data);
+                System.IO.File.WriteAllText($"{this.storagePath}/{PlayerInfo.Instance.PlayerName}-{stimulusName}.json", dataJson);
             }
-
-            string dataJson = JsonUtility.ToJson(data);
-            System.IO.File.WriteAllText($"{this.storagePath}/{PlayerInfo.Instance.PlayerName}-{stimulusName}.json", dataJson);
+            catch (Exception e)
+            {
+                Debug.Log($"Failed to save data for {stimulusName}. Will rerun.");
+                Debug.Log(e);
+                OnFailedSave(stimulusName);
+            }
         }
-        catch (Exception e)
+        else
         {
-            Debug.Log($"Failed to save data for {stimulusName}. Will rerun.");
-            Debug.Log(e);
-            OnFailedSave(stimulusName);
+            Debug.Log($"Not saving data. If unintended, please change the save parameter in the Experiment Order.");
         }
-
     }
 }

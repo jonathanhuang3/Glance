@@ -114,13 +114,13 @@ public class TumblingOptotype : Stimulus
     private ParticleSystem scotomaPs; // particle system from scotoma set from scotomaHandler
     private ParticleSystem.ShapeModule shape;
     private ParticleSystem.MainModule main;
-    // MetaStimulus for this stimulus stores scotoma information, MetaStimulus.Scotoma.Grid, which is currently not being used.
+    // MetaStimulus for this stimulus stores scotoma, which is currently not being used.
     private enum ScotomaGrid { S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, NumStates }; // Corresponds to indices in masks. Finer modulation of noise occurs through `tiling`
     private ScotomaGrid state = ScotomaGrid.S0; // 1.9 - (state) * 0.1 = random dispersion of particles
     private float minParticleDispersion = 1f; // 0.4f
     private float maxParticleDispersion = 800f; // 1.9f
     // Least to most difficult
-    private int numStates = 16;
+    public int numStates = 16;
     private int numGroups = 4;
     // Least to most difficult
     private List<float> particleDispersions = new List<float>();
@@ -148,6 +148,7 @@ public class TumblingOptotype : Stimulus
         base.OnEnable();
         audioData = audioObject.GetComponent<AudioSource>();
         repetitionCount = 0;
+        particleDispersions.Clear();
         userResponses.Clear();
 
         if (particleDispersions.Count == 0)
@@ -365,31 +366,38 @@ public class TumblingOptotype : Stimulus
 
     public override void SaveTrackingData(string stimulusName)
     {
-        try
+        if (this.saveTracking)
         {
-            base.SaveTrackingData(stimulusName);
-
-            OptotypeData optotypeData = new OptotypeData()
+            try
             {
-                playerName = PlayerInfo.Instance.PlayerName,
-                playerID = PlayerInfo.Instance.PlayerID,
-                stimulusName = stimulusName,
-                duration = this.duration,
-                gazePositions = this.gazePositions.ToArray(),
-                rotatedGaze = this.rotatedGaze.ToArray(),
-                gazeRotations = this.gazeRotations.ToArray(),
-                gazeTimes = this.gazeTimes.ToArray(),
-                userResponses = userResponses,
-                fractionVisible = this.fractionVisible.Select(x => float.IsNaN(x) ? -1 : x).ToArray()
-            };
-            string json = JsonUtility.ToJson(optotypeData);
-            System.IO.File.WriteAllText($"{this.storagePath}/{PlayerInfo.Instance.PlayerName}-{stimulusName}.json", json);
+                base.SaveTrackingData(stimulusName);
 
+                OptotypeData optotypeData = new OptotypeData()
+                {
+                    playerName = PlayerInfo.Instance.PlayerName,
+                    playerID = PlayerInfo.Instance.PlayerID,
+                    stimulusName = stimulusName,
+                    duration = this.duration,
+                    gazePositions = this.gazePositions.ToArray(),
+                    rotatedGaze = this.rotatedGaze.ToArray(),
+                    gazeRotations = this.gazeRotations.ToArray(),
+                    gazeTimes = this.gazeTimes.ToArray(),
+                    userResponses = userResponses,
+                    fractionVisible = this.fractionVisible.Select(x => float.IsNaN(x) ? -1 : x).ToArray()
+                };
+                string json = JsonUtility.ToJson(optotypeData);
+                System.IO.File.WriteAllText($"{this.storagePath}/{PlayerInfo.Instance.PlayerName}-{stimulusName}.json", json);
+
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Failed to save data for " + stimulusName + " with error: " + e);
+                OnFailedSave(stimulusName);
+            }
         }
-        catch (Exception e)
+        else
         {
-            Debug.Log("Failed to save data for " + stimulusName + " with error: " + e);
-            OnFailedSave(stimulusName);
+            Debug.Log($"Not saving data. If unintended, please change the save parameter in the Experiment Order.");
         }
     }
 }

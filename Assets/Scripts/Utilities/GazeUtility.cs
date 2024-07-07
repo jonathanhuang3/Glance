@@ -48,6 +48,17 @@ namespace Tobii.XR
             {
                 return Vector3.zero;
             }
+
+            // rayOrigin = eyeTrackingData.GazeRay.Origin;
+            // rayDirection = eyeTrackingData.GazeRay.Direction;
+            // return rayDirection;
+
+        }
+
+        public bool CheckGazeValidity()
+        {
+            var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
+            return eyeTrackingData.GazeRay.IsValid;
         }
 
         // Utility Methods

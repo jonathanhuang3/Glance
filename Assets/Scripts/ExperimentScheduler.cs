@@ -178,13 +178,15 @@ public class ExperimentScheduler : MonoBehaviour
                 particleController.driver = currentMetaStimulus.driver;
                 particleController.instructions = currentMetaStimulus.name;
                 particleController.duration = currentMetaStimulus.duration;
+                particleController.saveTracking = currentMetaStimulus.saveTracking;
                 particleController.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
                 particleController.movementDirection = (ParticleController.Direction)currentMetaStimulus.movementDirection;
-                particleController.unidirectional = currentMetaStimulus.unidirectionalDots;
+                particleController.unidirectional = currentMetaStimulus.unidirectional;
                 particleController.timeRepetitions = currentMetaStimulus.numRepetitions;
                 particleController.contrast = (ParticleController.Contrast)currentMetaStimulus.contrast;
                 // Add cycle contrast toggle
                 particleController.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
+                particleController.cycleScotoma = currentMetaStimulus.cycleScotoma;
                 objectDriver.SetActive(true);
                 break;
             case MetaStimulus.OKRDriver.Unidirectional:
@@ -193,9 +195,10 @@ public class ExperimentScheduler : MonoBehaviour
                 unidirectional.driver = currentMetaStimulus.driver;
                 unidirectional.instructions = currentMetaStimulus.name;
                 unidirectional.duration = currentMetaStimulus.duration;
+                unidirectional.saveTracking = currentMetaStimulus.saveTracking;
                 unidirectional.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
                 unidirectional.motion = (UnidirectionalHandler.Direction)currentMetaStimulus.movementDirection;
-                unidirectional.fixationPoint = currentMetaStimulus.fixationPoint;
+                unidirectional.fixate = currentMetaStimulus.fixate;
                 unidirectional.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
                 objectDriver.SetActive(true);
                 break;
@@ -205,6 +208,7 @@ public class ExperimentScheduler : MonoBehaviour
                 cobra.driver = currentMetaStimulus.driver;
                 cobra.instructions = currentMetaStimulus.name;
                 cobra.repetitionLimit = currentMetaStimulus.repetitionLimit;
+                cobra.saveTracking = currentMetaStimulus.saveTracking;
                 cobra.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
                 cobra.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
                 objectDriver.SetActive(true);
@@ -213,7 +217,9 @@ public class ExperimentScheduler : MonoBehaviour
                 TumblingOptotype tumblingOptotype = objectDriver.GetComponent<TumblingOptotype>();
                 tumblingOptotype.stimulusName = currentMetaStimulus.name;
                 tumblingOptotype.driver = currentMetaStimulus.driver;
+                tumblingOptotype.numStates = currentMetaStimulus.numStates;
                 tumblingOptotype.repetitionLimit = currentMetaStimulus.repetitionLimit;
+                tumblingOptotype.saveTracking = currentMetaStimulus.saveTracking;
                 tumblingOptotype.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
                 // Noise and initial optotype direction could be laid here
                 tumblingOptotype.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;

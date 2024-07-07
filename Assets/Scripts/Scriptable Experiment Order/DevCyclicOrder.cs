@@ -16,17 +16,20 @@ public class DevCyclicOrder : ExperimentOrder
             movementDirection = MetaStimulus.Direction.Up,
             contrast = MetaStimulus.Contrast.Cycle,
             scotoma = MetaStimulus.Scotoma.None,
-            duration = 190f,
+            duration = 40f,
             calibNeeded = false
 
         });
 
         MetaStimuli.Add(new MetaStimulus
         {
-            name = "Unidirectional",
-            driver = MetaStimulus.OKRDriver.Unidirectional,
-            scotoma = MetaStimulus.Scotoma.None,
-            duration = 190f,
+            name = "Unidirectional Dots Fixation",
+            driver = MetaStimulus.OKRDriver.Dots,
+            scotoma = MetaStimulus.Scotoma.Fixation,
+            movementDirection = MetaStimulus.Direction.Up,
+            unidirectional = true,
+            fixate = true,
+            duration = 40f,
             calibNeeded = false
 
         });
@@ -44,7 +47,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "OKR 1",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f
@@ -57,7 +60,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "OKR 2",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f
@@ -69,7 +72,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "OKR 3",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f
@@ -81,7 +84,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "OKR 4",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f
@@ -93,7 +96,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "OKR 5",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f
@@ -114,7 +117,7 @@ public class DevCyclicOrder : ExperimentOrder
         //     name = "Stimulus 2",
         //     driver = MetaStimulus.OKRDriver.Dots,
         //     movementDirection = MetaStimulus.Direction.Up,
-        //     unidirectionalDots = true,
+        //     unidirectional = true,
         //     contrast = MetaStimulus.Contrast.High,
         //     scotoma = MetaStimulus.Scotoma.Cone,
         //     duration = 190f, //423f

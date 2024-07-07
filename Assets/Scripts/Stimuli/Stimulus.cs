@@ -19,6 +19,7 @@ public class Data
     public Vector3[] rotatedGaze;
     public Quaternion[] gazeRotations;
     public float[] gazeTimes;
+    public float[] invalidGazetimes;
 }
 
 public class Stimulus : MonoBehaviour
@@ -48,7 +49,7 @@ public class Stimulus : MonoBehaviour
 
     // Stimulus associated objects
     public GameObject scotomaHandler;
-    public enum Scotoma { None, Cone, Central, Peripheral, Grid };
+    public enum Scotoma { None, Cone, Central, Peripheral, Grid, Fixation };
     public Scotoma scotoma = Scotoma.None;
 
     // Eye tracking and data setup
@@ -63,6 +64,7 @@ public class Stimulus : MonoBehaviour
     protected List<Quaternion> gazeRotations = new List<Quaternion>();
     protected List<Vector3> rotatedGaze = new List<Vector3>();
     protected List<float> gazeTimes = new List<float>();
+    protected List<float> invalidGazeTimes = new List<float>();
 
     public RenderTexture renderTexture; // Set to the default layer camera's target texture
     public RenderTexture stimulusRenderTexture; // Set to the stimulus layer camera's target texture
@@ -149,6 +151,7 @@ public class Stimulus : MonoBehaviour
         this.rotatedGaze.Add(Quaternion.Inverse(this.headingRotation) * this.rayDirection); // Rotates gaze vector back in front of origin
         this.gazeRotations.Add(Quaternion.Inverse(this.headingRotation)); //Rotation to get gaze vector back in front of origin
         this.gazeTimes.Add(Time.time);
+        this.invalidGazeTimes.Add(this.gazeUtility.CheckGazeValidity() ? -1f : Time.time);
 
         timeAlive += Time.deltaTime; // Time-based control of stimuli length for most stimuli except COBRA.
         if (this.scotoma != Scotoma.None) fractionVisible.Add(PixelsVisible(renderTexture) / PixelsVisible(stimulusRenderTexture));
@@ -269,12 +272,14 @@ public class Stimulus : MonoBehaviour
             string rotatedGazeFile = $"rotatedGaze.txt";
             string rotationsForGazeFile = $"gazeRotations.txt"; // Quaternion of gaze ray rotation
             string timeFile = $"gazeTime.txt";
+            string invalidTimeFile = $"invalidGazeTimes.txt";
 
             System.IO.Directory.CreateDirectory(this.storagePath);
             System.IO.File.WriteAllLines($"{this.storagePath}/{gazeFile}", ListToString<Vector3>(this.gazePositions));
             System.IO.File.WriteAllLines($"{this.storagePath}/{rotatedGazeFile}", ListToString<Vector3>(this.rotatedGaze));
             System.IO.File.WriteAllLines($"{this.storagePath}/{rotationsForGazeFile}", ListToString<Quaternion>(this.gazeRotations));
             System.IO.File.WriteAllLines($"{this.storagePath}/{timeFile}", ListToString<float>(this.gazeTimes));
+            System.IO.File.WriteAllLines($"{this.storagePath}/{invalidTimeFile}", ListToString<float>(this.invalidGazeTimes));
 
 
         }
