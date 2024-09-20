@@ -89,6 +89,20 @@ public class ParticleController : Stimulus
         fixationPrefab.SetActive(fixate);
         fixationPrefab.transform.localScale = new Vector3(1, 1, 0);
         rampTimeAlive = 0;
+        // colorDisplayed.Clear();
+    }
+
+    protected override void ClearDataLists()
+    {
+        base.ClearDataLists();
+        steps.Clear();
+        stepContrasts.Clear();
+        colorDisplayed.Clear();
+        dotsFrequencies.Clear();
+        dotsPhase.Clear();
+        rampTimeAlive = 0;
+        fixationPrefab.transform.localScale = new Vector3(1, 1, 0);
+
     }
 
     protected override void OnDisable()
@@ -158,6 +172,7 @@ public class ParticleController : Stimulus
         if (cycleContrast)
         {
             // rampTimeAlive += Time.deltaTime;
+            colorDisplayed.Add(ps.GetComponent<Renderer>().material.color);
             StartCoroutine(CycleContrast());
         }
 

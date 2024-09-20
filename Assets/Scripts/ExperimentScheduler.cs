@@ -20,6 +20,7 @@ public class ExperimentScheduler : MonoBehaviour
     public IEnumerator<MetaStimulus> scheduleEnumerator;
 
     // Stimulus setup
+    public GameObject XRCamera;
     public GameObject rotationHandle;
     public List<GameObject> drivers = new List<GameObject>();
     private GameObject objectDriver;
@@ -28,7 +29,9 @@ public class ExperimentScheduler : MonoBehaviour
 
 
     // Internal setup
+    public GameObject fasterTracker;
     private GazeUtility gazeUtility;
+    // private FasterTracker gazeUtility;
     private DateTime experimentStartTime;
     private int currentStimulus = 0;
 
@@ -42,6 +45,7 @@ public class ExperimentScheduler : MonoBehaviour
         scheduleEnumerator = schedule.MetaStimuli.GetEnumerator();
         experimentStartTime = DateTime.Now;
         gazeUtility = new GazeUtility();
+        // gazeUtility = fasterTracker.GetComponent<FasterTracker>();
         BeginExperiment();
     }
 
@@ -179,7 +183,7 @@ public class ExperimentScheduler : MonoBehaviour
                 particleController.instructions = currentMetaStimulus.name;
                 particleController.duration = currentMetaStimulus.duration;
                 particleController.saveTracking = currentMetaStimulus.saveTracking;
-                particleController.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded; // Refresh calibration when skipping stimuli.
+                particleController.calibNeeded = calibNeeded; // || currentMetaStimulus.calibNeeded Refresh calibration when skipping stimuli.
                 particleController.movementDirection = (ParticleController.Direction)currentMetaStimulus.movementDirection;
                 particleController.unidirectional = currentMetaStimulus.unidirectional;
                 particleController.timeRepetitions = currentMetaStimulus.numRepetitions;
@@ -196,7 +200,7 @@ public class ExperimentScheduler : MonoBehaviour
                 unidirectional.instructions = currentMetaStimulus.name;
                 unidirectional.duration = currentMetaStimulus.duration;
                 unidirectional.saveTracking = currentMetaStimulus.saveTracking;
-                unidirectional.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
+                unidirectional.calibNeeded = calibNeeded; //|| currentMetaStimulus.calibNeeded;
                 unidirectional.motion = (UnidirectionalHandler.Direction)currentMetaStimulus.movementDirection;
                 unidirectional.fixate = currentMetaStimulus.fixate;
                 unidirectional.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
@@ -209,7 +213,7 @@ public class ExperimentScheduler : MonoBehaviour
                 cobra.instructions = currentMetaStimulus.name;
                 cobra.repetitionLimit = currentMetaStimulus.repetitionLimit;
                 cobra.saveTracking = currentMetaStimulus.saveTracking;
-                cobra.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
+                cobra.calibNeeded = calibNeeded; //|| currentMetaStimulus.calibNeeded;
                 cobra.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
                 objectDriver.SetActive(true);
                 break;
@@ -220,7 +224,7 @@ public class ExperimentScheduler : MonoBehaviour
                 tumblingOptotype.numStates = currentMetaStimulus.numStates;
                 tumblingOptotype.repetitionLimit = currentMetaStimulus.repetitionLimit;
                 tumblingOptotype.saveTracking = currentMetaStimulus.saveTracking;
-                tumblingOptotype.calibNeeded = calibNeeded || currentMetaStimulus.calibNeeded;
+                tumblingOptotype.calibNeeded = calibNeeded; //|| currentMetaStimulus.calibNeeded
                 // Noise and initial optotype direction could be laid here
                 tumblingOptotype.scotoma = (Stimulus.Scotoma)currentMetaStimulus.scotoma;
                 objectDriver.SetActive(true);

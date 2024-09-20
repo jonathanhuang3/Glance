@@ -165,6 +165,17 @@ public class TumblingOptotype : Stimulus
             Debug.Log($"Occlusion list size: {particleDispersions.Count}");
         }
     }
+
+    protected override void ClearDataLists()
+    {
+        base.ClearDataLists();
+        particleDispersions.Clear();
+        particleDispersionGroups.Clear();
+        responses.Clear();
+        fractionVisibleState.Clear();
+        userResponses.Clear();
+
+    }
     protected override void Update()
     {
         base.Update();

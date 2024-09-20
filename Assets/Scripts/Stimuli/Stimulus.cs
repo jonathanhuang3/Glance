@@ -30,6 +30,8 @@ public class Stimulus : MonoBehaviour
     public float duration; // in seconds
     protected float timeAlive = 0f; // in seconds
 
+    public GameObject XRRig;
+
     // Stimulus setup
     // protected List<GameObject> stimObjs = new List<GameObject>(); // Current plan to attach children of Stimulus class to enabeld/disabled gameobjects in scene
     public delegate void StimulusEventHandler(string stimulusName);
@@ -53,7 +55,9 @@ public class Stimulus : MonoBehaviour
     public Scotoma scotoma = Scotoma.None;
 
     // Eye tracking and data setup
+    public GameObject fasterTracker;
     protected GazeUtility gazeUtility;
+    // protected FasterTracker gazeUtility;
     public bool saveTracking = true;
     public bool calibNeeded = true;
     protected string storagePath;
@@ -116,7 +120,9 @@ public class Stimulus : MonoBehaviour
     {
         timeAlive = 0f;
         this.gazeUtility = new GazeUtility();
+        // this.gazeUtility = fasterTracker.GetComponent<FasterTracker>();
         this.storagePath = $"Assets/Scripts/SpaceTime/{PlayerInfo.Instance.PlayerName}/{stimulusName}";
+        ClearDataLists();
         if (scotoma != Scotoma.None)
         {
             ToggleScotoma(true);
@@ -129,6 +135,16 @@ public class Stimulus : MonoBehaviour
         }
 
         TryToCalibrate();
+    }
+
+    protected virtual void ClearDataLists()
+    {
+        this.gazePositions.Clear(); // Absolute gaze vector in world space (shifted due to rotation of XR rig)
+        this.rotatedGaze.Clear();
+        this.gazeRotations.Clear();
+        this.gazeTimes.Clear();
+        this.invalidGazeTimes.Clear();
+        fractionVisible.Clear();
     }
 
     protected virtual void OnDisable()
@@ -149,6 +165,7 @@ public class Stimulus : MonoBehaviour
 
         this.gazePositions.Add(this.rayDirection); // Absolute gaze vector in world space (shifted due to rotation of XR rig)
         this.rotatedGaze.Add(Quaternion.Inverse(this.headingRotation) * this.rayDirection); // Rotates gaze vector back in front of origin
+        // this.rotatedGaze.Add(Quaternion.Inverse(XRRig.transform.rotation) * this.rayDirection); // Rotates gaze vector back in front of origin
         this.gazeRotations.Add(Quaternion.Inverse(this.headingRotation)); //Rotation to get gaze vector back in front of origin
         this.gazeTimes.Add(Time.time);
         this.invalidGazeTimes.Add(this.gazeUtility.CheckGazeValidity() ? -1f : Time.time);
@@ -168,6 +185,11 @@ public class Stimulus : MonoBehaviour
         {
             RepeatThisStimulus();
         }
+        else if (Input.GetKeyDown(KeyCode.E) && Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log("Premature end of stimulus");
+            EndStimulus();
+        }
     }
 
     protected virtual bool ShouldEndStimulus()
@@ -180,7 +202,7 @@ public class Stimulus : MonoBehaviour
         if (!Application.isPlaying) return; // Gets Unity to stop trying to update Gizmos after it is done playing.
 
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(gazeUtility.rayOrigin, rayDirection * 3.0f);
+        // Gizmos.DrawRay(gazeUtility.rayOrigin, rayDirection * 3.0f);
         Gizmos.DrawWireSphere(rayDirection * 3.0f, 0.5f);
     }
 
@@ -269,9 +291,11 @@ public class Stimulus : MonoBehaviour
         {
             // To save gaze data, keep meta file with current date and time.
             string gazeFile = $"gazeSpace.txt";
+            string gazeFile120 = $"gazeSpace120.txt";
             string rotatedGazeFile = $"rotatedGaze.txt";
             string rotationsForGazeFile = $"gazeRotations.txt"; // Quaternion of gaze ray rotation
             string timeFile = $"gazeTime.txt";
+            string timeFile120 = $"gazeTime120.txt";
             string invalidTimeFile = $"invalidGazeTimes.txt";
 
             System.IO.Directory.CreateDirectory(this.storagePath);
@@ -281,6 +305,11 @@ public class Stimulus : MonoBehaviour
             System.IO.File.WriteAllLines($"{this.storagePath}/{timeFile}", ListToString<float>(this.gazeTimes));
             System.IO.File.WriteAllLines($"{this.storagePath}/{invalidTimeFile}", ListToString<float>(this.invalidGazeTimes));
 
+
+            // var (gazeSpace120, gazeTime120) = gazeUtility.GetAcquiredEyeData();
+
+            // System.IO.File.WriteAllLines($"{this.storagePath}/{gazeFile120}", ListToString<Vector3>(gazeSpace120));
+            // System.IO.File.WriteAllLines($"{this.storagePath}/{timeFile120}", ListToString<float>(gazeTime120));
 
         }
     }

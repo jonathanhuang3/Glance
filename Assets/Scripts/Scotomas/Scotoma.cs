@@ -9,6 +9,7 @@ public class Scotoma : MonoBehaviour
     public bool gazeContingent = false;
     protected float speed = 3f;
     public bool toggleMotionJitter = true;
+    public Color color;
 
     public MetaStimulus.OKRDriver driver = MetaStimulus.OKRDriver.TumblingE;
     protected GazeUtility gazeUtility;
@@ -41,7 +42,14 @@ public class Scotoma : MonoBehaviour
             TrackGaze();
         }
 
-        if (toggleMotionJitter) transform.position += MotionJitter();
+        if (toggleMotionJitter)
+        {
+            Vector3 motionJitter = MotionJitter();
+            motionJitter.z = 0f;
+            // if (Time.frameCount % 30 == 0) Debug.Log(motionJitter);
+            // transform.position += motionJitter;
+            transform.Translate(motionJitter, Space.World);
+        }
     }
 
     protected virtual void SetOKRDriver(MetaStimulus.OKRDriver newDriver)
@@ -78,11 +86,12 @@ public class Scotoma : MonoBehaviour
     {
         // Jitter particles uniformly
         // shape.position = Vector3.Lerp(shape.position, new Vector3(Random.Range(-bound, bound), 0f, Random.Range(-bound, bound)), 0.1f);
-        float bound = 0.25f;
-        Vector3 translation = new Vector3(Random.Range(-bound, bound), Random.Range(-bound, bound), 0f) * Time.deltaTime;
-        translation.x = Mathf.Clamp(translation.x, -bound, bound); // Keep within bounds
-        translation.y = Mathf.Clamp(translation.y, -bound, bound);
-        return Random.insideUnitCircle * bound * Time.deltaTime;
+        float bound = 0.25f; //0.25f
+        Vector3 translation = new Vector3(Random.Range(-bound, bound), Random.Range(-bound, bound), 0f);
+        // translation.x = Mathf.Clamp(translation.x, -bound, bound); // Keep within bounds
+        // translation.y = Mathf.Clamp(translation.y, -bound, bound);
+        // return Random.insideUnitCircle * bound * Time.deltaTime;
+        return translation * Time.deltaTime;
     }
 
     /// <summary>

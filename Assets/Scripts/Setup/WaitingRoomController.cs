@@ -36,7 +36,6 @@ public class WaitingRoomController : MonoBehaviour
     void Update()
     {
         // Issue with perpetual rotation occurs when rotating the attached gameobject. solution is to create nested gameobject 'Handle', and rotate, thus rotating the actual canvas.
-        // GameObject.Find("Handle").transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -50,6 +49,12 @@ public class WaitingRoomController : MonoBehaviour
         {
             SkipNextStimulusEvent?.Invoke();
         }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            calibNeeded = !calibNeeded;
+            stimuliLeftText.text = $"\nWill {(calibNeeded ? "" : "not ")}calibrate once exiting waiting room\nPress \u2192 to begin Stimulus {stimuliCompleted + 1}";
+        }
+
     }
 
     public void UpdateProgress()

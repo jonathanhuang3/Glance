@@ -32,7 +32,7 @@ public class PatientExperimentOrder : ExperimentOrder
             contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.None,
             duration = 40f,
-            calibNeeded = false
+            calibNeeded = true
 
         });
 
@@ -47,7 +47,7 @@ public class PatientExperimentOrder : ExperimentOrder
             contrast = MetaStimulus.Contrast.Cycle,
             scotoma = MetaStimulus.Scotoma.None,
             duration = 40f,
-            calibNeeded = true
+            calibNeeded = false
 
         });
 
@@ -95,7 +95,7 @@ public class PatientExperimentOrder : ExperimentOrder
             driver = MetaStimulus.OKRDriver.TumblingE,
             scotoma = MetaStimulus.Scotoma.Cone,
             repetitionLimit = 15,
-            numStates = 16,
+            numStates = 16, // z: 4.648 changed to 4.6 with patient due to scotomas rotating behind optotype.
             calibNeeded = false
 
         });
@@ -111,7 +111,7 @@ public class PatientExperimentOrder : ExperimentOrder
             cycleScotoma = true,
             duration = 190f, //423f
             numRepetitions = 1,
-            calibNeeded = false
+            calibNeeded = true
 
         });
 
@@ -153,7 +153,7 @@ public class PatientExperimentOrder : ExperimentOrder
             contrast = MetaStimulus.Contrast.High,
             scotoma = MetaStimulus.Scotoma.None,
             duration = 190f,
-            calibNeeded = false
+            calibNeeded = true
 
         });
 
@@ -231,7 +231,7 @@ public class PatientExperimentOrder : ExperimentOrder
             unidirectional = true,
             fixate = true,
             duration = 40f,
-            calibNeeded = false
+            calibNeeded = true
 
         });
 
