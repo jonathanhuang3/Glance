@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.tobii.xr.sdk": "file:C:/Users/jjohn/Downloads/TobiiXRSDK_3.0.1.179",
+    "com.tobii.xr.sdk": "file:/Users/jonathanhuang/Downloads/TobiiXRSDK_3.0.1.179",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.ide.rider": "3.0.28",
     "com.unity.ide.visualstudio": "2.0.22",
