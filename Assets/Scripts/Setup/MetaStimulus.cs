@@ -15,7 +15,7 @@ public class MetaStimulus
     public enum Contrast { Low, High, Cycle }
     public Contrast contrast = Contrast.High;
 
-    public enum Scotoma { None, Cone, Central, Peripheral, Grid, Fixation };
+    public enum Scotoma { None, Cone, Central, Peripheral, Grid, Fixation, SuperiorHemifield, InferiorHemifield };
     public Scotoma scotoma = Scotoma.None;
     public bool fixate = false; // For OKR Suppression stimulus
     public bool cycleScotoma = false; // For OKR scotoma growth/decay stimulus

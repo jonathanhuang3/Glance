@@ -51,7 +51,7 @@ public class Stimulus : MonoBehaviour
 
     // Stimulus associated objects
     public GameObject scotomaHandler;
-    public enum Scotoma { None, Cone, Central, Peripheral, Grid, Fixation };
+    public enum Scotoma { None, Cone, Central, Peripheral, Grid, Fixation, SuperiorHemifield, InferiorHemifield };
     public Scotoma scotoma = Scotoma.None;
 
     // Eye tracking and data setup

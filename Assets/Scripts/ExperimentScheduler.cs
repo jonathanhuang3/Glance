@@ -230,7 +230,7 @@ public class ExperimentScheduler : MonoBehaviour
                 objectDriver.SetActive(true);
                 break;
         }
-        // StartDriver?.Invoke(currentMetaStimulus.driver); // Invokes after objectDriver is set active.
+        StartDriver?.Invoke(currentMetaStimulus.driver); // Invokes after objectDriver is set active.
         if (!repeatStimulus)
         {
             currentStimulus++;
