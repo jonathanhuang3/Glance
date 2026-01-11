@@ -24,7 +24,7 @@ public class Scotoma : MonoBehaviour
         ExperimentScheduler.StartDriver += SetOKRDriver;
     }
 
-    void OnDisable()
+    protected virtual void OnDisable()
     {
         Stimulus.ModulateScotomaOcclusion -= ModulateOcclusion;
         Stimulus.CycleScotomaOcclusion -= CycleOcclusion;
