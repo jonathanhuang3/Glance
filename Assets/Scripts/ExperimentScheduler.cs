@@ -51,7 +51,18 @@ public class ExperimentScheduler : MonoBehaviour
 
     void Update()
     {
-        rotationHandle.transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
+        
+        // For remote testing without Tobii SDK initialized
+        if (gazeUtility == null) return;
+        
+        try
+        {
+            rotationHandle.transform.rotation = gazeUtility.HeadingRotation(transform.forward, transform.up);
+        }
+        catch (System.NullReferenceException)
+        {
+            // Tobii SDK not initialized; skip rotation update
+        }
     }
 
     void OnEnable()

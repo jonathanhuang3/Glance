@@ -154,8 +154,32 @@ public class Stimulus : MonoBehaviour
 
     protected virtual void Update()
     {
-        this.rayDirection = this.gazeUtility.GetGazeRay();
-        this.headingRotation = this.gazeUtility.HeadingRotation(transform.forward, transform.up); // Useful to rotate stimulus to directly in front of XR rig
+        if (gazeUtility == null)
+        {
+            // If eye tracking unavailable, still track time for stimulus duration
+            timeAlive += Time.deltaTime;
+            if (ShouldEndStimulus())
+            {
+                EndStimulus();
+            }
+            return;
+        }
+
+        try
+        {
+            this.rayDirection = this.gazeUtility.GetGazeRay();
+            this.headingRotation = this.gazeUtility.HeadingRotation(transform.forward, transform.up); // Useful to rotate stimulus to directly in front of XR rig
+        }
+        catch (System.NullReferenceException)
+        {
+            // Tobii SDK not initialized; continue without eye tracking
+            timeAlive += Time.deltaTime;
+            if (ShouldEndStimulus())
+            {
+                EndStimulus();
+            }
+            return;
+        }
 
         // Rotate the stimulus system. Hopefully, all other components will rotate as well, if they are children of the rotation handle.
         // ps.transform.rotation = this.headingRotation; // This won't be necessary if the particle system is a child of the rotation handle
